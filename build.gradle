@@ -31,6 +31,8 @@ dependencies {
     implementation("net.dv8tion:JDA:6.1.1") // Discord API
     implementation 'io.github.cdimascio:java-dotenv:5.2.2' // .env 라이브러리
 
+    testImplementation 'com.h2database:h2' // 테스트 용 임베디드 DB
+    runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.5'

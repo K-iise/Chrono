@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import woowa.chrono.domain.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
-    Optional<Member> findByDiscordId(String discordId);
+    Optional<Member> findByUserId(String userId);
 }

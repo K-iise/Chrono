@@ -25,7 +25,7 @@ public class Member {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String userID;
+    private String userId;
 
     private String userName;
 
