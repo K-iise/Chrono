@@ -4,5 +4,4 @@ public enum Grade {
     NEWBIE,
     REGULAR,
     ADMIN
-
 }
