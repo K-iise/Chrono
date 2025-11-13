@@ -13,10 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -34,13 +32,38 @@ public class Member {
     @Column(name = "user_name")
     private String userName;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "grade")
-    private Grade grade;
+    private Grade grade = Grade.NEWBIE;
 
+    @Builder.Default
     @Column(name = "usage_time")
-    private Duration usageTime;
+    private Duration usageTime = Duration.ZERO;
 
+    @Builder.Default
     @Column(name = "point")
-    int point;
+    int point = 0;
+
+    public void changeGrade(Grade newGrade) {
+        this.grade = newGrade;
+    }
+
+    public void addPoint(int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("포인트는 음수로 추가할 수 없습니다.");
+        }
+        this.point += amount;
+    }
+
+    public void usePoint(int amount) {
+        if (this.point < amount) {
+            throw new IllegalStateException("포인트가 부족합니다.");
+        }
+        this.point -= amount;
+    }
+
+    public void addUsageTime(Duration time) {
+        this.usageTime = this.usageTime.plus(time);
+    }
 }

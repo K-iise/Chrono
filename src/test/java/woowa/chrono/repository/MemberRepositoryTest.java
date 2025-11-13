@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
-import org.hibernate.annotations.SQLJoinTableRestriction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,7 @@ public class MemberRepositoryTest {
 
     @Test
     @DisplayName("멤버 등록 및 확인 테스트")
-    public void addMemberTest(){
+    public void addMemberTest() {
         Member member = Member.builder().userId("123").userName("홍길동").build();
         memberRepository.save(member);
 
@@ -33,13 +32,13 @@ public class MemberRepositoryTest {
     @Test
     @Transactional
     @DisplayName("멤버 등급 수정 테스트")
-    public void modifiedGradeTest(){
+    public void modifiedGradeTest() {
         // given
         Member member = Member.builder().userId("1234").userName("홍길동").grade(Grade.NEWBIE).build();
         memberRepository.save(member);
 
         // when
-        member.setGrade(Grade.REGULAR);
+        member.changeGrade(Grade.REGULAR);
 
         // then
         Member found = memberRepository.findById(member.getId()).orElse(null);
@@ -48,7 +47,7 @@ public class MemberRepositoryTest {
 
     @Test
     @DisplayName("멤버 삭제 테스트")
-    public void deleteMemberTest(){
+    public void deleteMemberTest() {
         // given
         Member member = Member.builder().userId("abcd").userName("홍길동").grade(Grade.NEWBIE).build();
         memberRepository.save(member);
@@ -63,7 +62,7 @@ public class MemberRepositoryTest {
 
     @Test
     @DisplayName("유저 ID로 멤버 조회 테스트")
-    public void findByUserIdTest(){
+    public void findByUserIdTest() {
         // given
         Member member = Member.builder().userId("1234").userName("홍길동").grade(Grade.NEWBIE).build();
         memberRepository.save(member);
