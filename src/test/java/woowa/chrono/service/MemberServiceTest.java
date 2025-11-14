@@ -53,10 +53,10 @@ public class MemberServiceTest {
         memberRepository.save(member);
 
         // when
-        Member found = memberService.getUsageTime(member.getUserId());
+        Duration found = memberService.getUsageTime(member.getUserId());
 
         // then
-        Assertions.assertThat(found.getUsageTime()).isEqualTo(Duration.ZERO);
+        Assertions.assertThat(found).isEqualTo(Duration.ZERO);
     }
 
 }

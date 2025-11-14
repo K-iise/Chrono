@@ -1,5 +1,6 @@
 package woowa.chrono.service;
 
+import java.time.Duration;
 import org.springframework.stereotype.Service;
 import woowa.chrono.domain.Grade;
 import woowa.chrono.domain.Member;
@@ -25,6 +26,13 @@ public class MemberService {
         );
         found.changeGrade(grade);
         return found;
+    }
+
+    public Duration getUsageTime(String userId) {
+        Member found = memberRepository.findByUserId(userId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 회원입니다.")
+        );
+        return found.getUsageTime();
     }
 
     private void validateDuplication(Member member) {
