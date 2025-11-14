@@ -1,5 +1,6 @@
 package woowa.chrono.service;
 
+import java.time.Duration;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ public class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("멤버 등급을 변경한다")
+    @DisplayName("사용자의 등급을 변경합니다.")
     public void updateMemberGradeTest() {
         // given
         Member member = Member.builder().userId("123").userName("홍길동").build();
@@ -42,6 +43,20 @@ public class MemberServiceTest {
 
         // then
         Assertions.assertThat(found.getGrade()).isEqualTo(Grade.REGULAR);
+    }
+
+    @Test
+    @DisplayName("사용자의 남은 이용시간을 조회합니다.")
+    public void getUsageTimeTest() {
+        // given
+        Member member = Member.builder().userId("12").userName("홍길동").usageTime(Duration.ZERO).build();
+        memberRepository.save(member);
+
+        // when
+        Member found = memberService.getUsageTime(member.getUserId());
+
+        // then
+        Assertions.assertThat(found.getUsageTime()).isEqualTo(Duration.ZERO);
     }
 
 }
