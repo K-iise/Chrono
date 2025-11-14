@@ -1,6 +1,7 @@
 package woowa.chrono.service;
 
 import org.springframework.stereotype.Service;
+import woowa.chrono.domain.Grade;
 import woowa.chrono.domain.Member;
 import woowa.chrono.repository.MemberRepository;
 
@@ -16,6 +17,14 @@ public class MemberService {
     public Member registerMember(Member member) {
         validateDuplication(member);
         return memberRepository.save(member);
+    }
+
+    public Member updateMemberGrade(String userId, Grade grade) {
+        Member found = memberRepository.findByUserId(userId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 회원입니다.")
+        );
+        found.changeGrade(grade);
+        return found;
     }
 
     private void validateDuplication(Member member) {
