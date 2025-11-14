@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import woowa.chrono.domain.Member;
 import woowa.chrono.service.MemberService;
@@ -14,8 +13,11 @@ import woowa.chrono.service.MemberService;
 @Component
 public class MemberListener extends ListenerAdapter {
 
-    @Autowired
-    private MemberService memberService;
+    private final MemberService memberService;
+
+    public MemberListener(MemberService memberService) {
+        this.memberService = memberService;
+    }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {

@@ -1,6 +1,5 @@
 package woowa.chrono.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import woowa.chrono.domain.Member;
 import woowa.chrono.repository.MemberRepository;
@@ -8,8 +7,11 @@ import woowa.chrono.repository.MemberRepository;
 @Service
 public class MemberService {
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
+
+    public MemberService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
 
     public Member registerMember(Member member) {
         validateDuplication(member);
