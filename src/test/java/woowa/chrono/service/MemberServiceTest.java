@@ -242,5 +242,51 @@ public class MemberServiceTest {
         Assertions.assertThatThrownBy(() -> memberService.increasePoint(admin.getUserId(), "test", addpoint))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    @DisplayName("ADMIN 사용자가 REGULAR 사용자의 포인트을 정상적으로 수정한다.")
+    public void updatePointSuccessTest() {
+        // given
+        Member admin = Member.builder().userId("admin").grade(Grade.ADMIN).build();
+        Member member = Member.builder().userId("member").grade(Grade.REGULAR).point(1000).build();
+
+        memberRepository.save(admin);
+        memberRepository.save(member);
+
+        // when
+        int point = 100;
+        Member updatedMember = memberService.updatePoint(admin.getUserId(), member.getUserId(), point);
+
+        // then
+        Assertions.assertThat(updatedMember.getPoint()).isEqualTo(point);
+    }
+
+    @Test
+    @DisplayName("REGULAR 사용자가 포인트를 수정하면 예외가 발생한다.")
+    public void updatePointForbiddenTest() {
+        // given
+        Member regular = Member.builder().userId("regular").grade(Grade.REGULAR).build();
+        Member member = Member.builder().userId("member").grade(Grade.REGULAR).point(1000).build();
+
+        memberRepository.save(regular);
+        memberRepository.save(member);
+
+        // when & then
+        int point = 100;
+        Assertions.assertThatThrownBy(() -> memberService.updatePoint(regular.getUserId(), member.getUserId(), point))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 사용자의 포인트 수정 시 예외 발생")
+    public void updatePointUserNotFoundTest() {
+        // given
+        Member admin = Member.builder().userId("admin").grade(Grade.ADMIN).build();
+        int point = 100;
+
+        // when & then
+        Assertions.assertThatThrownBy(() -> memberService.updatePoint(admin.getUserId(), "test", point))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
 
