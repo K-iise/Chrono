@@ -2,11 +2,14 @@ package woowa.chrono.service;
 
 import java.time.Duration;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import woowa.chrono.domain.Grade;
 import woowa.chrono.domain.Member;
+import woowa.chrono.exception.ErrorCode;
 import woowa.chrono.repository.MemberRepository;
 
 @Service
+@Transactional
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -21,112 +24,92 @@ public class MemberService {
     }
 
     public Member updateMemberGrade(String userId, Grade grade) {
-        Member found = memberRepository.findByUserId(userId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 회원입니다.")
-        );
+        Member found = findMemberOrThrow(userId);
         found.changeGrade(grade);
         return found;
     }
 
     public Duration getUsageTime(String userId) {
-        Member found = memberRepository.findByUserId(userId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 회원입니다.")
-        );
+        Member found = findMemberOrThrow(userId);
         return found.getUsageTime();
     }
 
     public int getPoint(String userId) {
-        Member found = memberRepository.findByUserId(userId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 회원입니다,")
-        );
+        Member found = findMemberOrThrow(userId);
         return found.getPoint();
     }
 
     public Member increaseUsageTime(String adminId, String userId, int time) {
-        if (time <= 0) {
-            throw new IllegalArgumentException("추가 시간은 0보다 커야 합니다.");
-        }
-
-        Member admin = memberRepository.findByUserId(adminId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 관리자입니다.")
-        );
-
-        Member member = memberRepository.findByUserId(userId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 회원입니다.")
-        );
-
-        if (admin.getGrade() != Grade.ADMIN) {
-            throw new IllegalStateException("관리자가 아닌 경우 이용 시간을 증가 시킬 수 없습니다.");
-        }
+        validatePositiveTime(time);
+        requireAdmin(adminId);
+        Member member = findMemberOrThrow(userId);
 
         member.addUsageTime(Duration.ofMinutes(time));
         return member;
     }
 
+
     public Member updateUsageTime(String adminId, String userId, int time) {
-        if (time <= 0) {
-            throw new IllegalArgumentException("보유 시간은 0보다 커야 합니다.");
-        }
+        validatePositiveTime(time);
+        requireAdmin(adminId);
+        Member member = findMemberOrThrow(userId);
 
-        Member admin = memberRepository.findByUserId(adminId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 관리자입니다.")
-        );
-
-        Member member = memberRepository.findByUserId(userId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 회원입니다.")
-        );
-
-        if (admin.getGrade() != Grade.ADMIN) {
-            throw new IllegalStateException("관리자가 아닌 경우 이용 시간을 수정 시킬 수 없습니다.");
-        }
         member.updateUsageTime(Duration.ofMinutes(time));
         return member;
 
     }
 
-    public Member increasePoint(String adminId, String userId, int addpoint) {
-        if (addpoint <= 0) {
-            throw new IllegalArgumentException("추가하는 포인트는 0보다 커야 합니다.");
-        }
+    public Member increasePoint(String adminId, String userId, int point) {
+        validatePositivePoint(point);
+        requireAdmin(adminId);
+        Member member = findMemberOrThrow(userId);
 
-        Member admin = memberRepository.findByUserId(adminId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 관리자입니다.")
-        );
-
-        Member member = memberRepository.findByUserId(userId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 회원입니다.")
-        );
-
-        if (admin.getGrade() != Grade.ADMIN) {
-            throw new IllegalStateException("관리자가 아닌 경우에 포인트 추가를 할 수 없습니다.");
-        }
-        member.addPoint(addpoint);
+        member.addPoint(point);
         return member;
     }
 
+
     public Member updatePoint(String adminId, String userId, int point) {
-        if (point <= 0) {
-            throw new IllegalArgumentException("수정하는 포인트는 0보다 커야 합니다.");
-        }
+        validatePositivePoint(point);
+        requireAdmin(adminId);
+        Member member = findMemberOrThrow(userId);
 
-        Member admin = memberRepository.findByUserId(adminId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 관리자입니다.")
-        );
-
-        Member member = memberRepository.findByUserId(userId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 회원입니다.")
-        );
-
-        if (admin.getGrade() != Grade.ADMIN) {
-            throw new IllegalStateException("관리자가 아닌 경우에 포인트를 수정할 수 없습니다.");
-        }
         member.updatePoint(point);
         return member;
     }
 
-    private void validateDuplication(Member member) {
-        if (memberRepository.findByUserId(member.getUserId()).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 멤버입니다.");
+    private void validatePositiveTime(int time) {
+        if (time <= 0) {
+            throw new IllegalArgumentException(ErrorCode.INVALID_TIME.getMessage());
         }
     }
+
+    private void validatePositivePoint(int point) {
+        if (point <= 0) {
+            throw new IllegalArgumentException(ErrorCode.INVALID_POINT.getMessage());
+        }
+    }
+
+    private void validateDuplication(Member member) {
+        if (memberRepository.findByUserId(member.getUserId()).isPresent()) {
+            throw new IllegalArgumentException(ErrorCode.DUPLICATE_MEMBER.getMessage());
+        }
+    }
+
+    private Member findMemberOrThrow(String userId) {
+        return memberRepository.findByUserId(userId).orElseThrow(
+                () -> new IllegalArgumentException(ErrorCode.MEMBER_NOT_FOUND.getMessage())
+        );
+    }
+
+    private void requireAdmin(String adminId) {
+        Member admin = memberRepository.findByUserId(adminId).orElseThrow(
+                () -> new IllegalArgumentException(ErrorCode.ADMIN_NOT_FOUND.getMessage())
+        );
+        if (admin.getGrade() != Grade.ADMIN) {
+            throw new IllegalStateException(ErrorCode.NOT_ADMIN.getMessage());
+        }
+    }
+
+
 }
