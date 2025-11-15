@@ -6,11 +6,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 import woowa.chrono.domain.Grade;
 import woowa.chrono.domain.Member;
 import woowa.chrono.repository.MemberRepository;
 
 @SpringBootTest
+@Transactional
 public class MemberServiceTest {
     @Autowired
     private MemberService memberService;
@@ -49,7 +51,7 @@ public class MemberServiceTest {
     @DisplayName("사용자의 남은 이용시간을 조회합니다.")
     public void getUsageTimeTest() {
         // given
-        Member member = Member.builder().userId("12").userName("홍길동").usageTime(Duration.ZERO).build();
+        Member member = Member.builder().userId("20").userName("홍길동").usageTime(Duration.ZERO).build();
         memberRepository.save(member);
 
         // when
@@ -131,7 +133,7 @@ public class MemberServiceTest {
     public void increaseUsageTimeUserNotFoundTest() {
         // given
         Member admin = Member.builder()
-                .userId("admin")
+                .userId("admin2")
                 .grade(Grade.ADMIN)
                 .build();
 
