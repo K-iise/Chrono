@@ -73,4 +73,75 @@ public class MemberServiceTest {
         Assertions.assertThat(found).isEqualTo(1000);
     }
 
+    @Test
+    @DisplayName("ADMIN 사용자가 REGULAR 사용자의 이용 시간을 정상적으로 추가한다.")
+    public void increaseUsageTimeSuccessTest() {
+        // given
+        Member admin = Member.builder()
+                .userId("admin")
+                .grade(Grade.ADMIN)
+                .build();
+
+        Member member = Member.builder()
+                .userId("user1")
+                .grade(Grade.REGULAR)
+                .usageTime(Duration.ofMinutes(0))
+                .build();
+
+        memberRepository.save(admin);
+        memberRepository.save(member);
+
+        // when
+        int addTime = 100; // 분 단위라고 가정
+        Member updated = memberService.increaseUsageTime(admin.getUserId(), member.getUserId(), addTime);
+
+        // then
+        Assertions.assertThat(updated.getUsageTime())
+                .isEqualTo(Duration.ofMinutes(addTime));
+    }
+
+
+    @Test
+    @DisplayName("REGULAR 사용자가 이용 시간을 추가하면 예외가 발생한다.")
+    public void increaseUsageTimeForbiddenTest() {
+        // given
+        Member regular = Member.builder()
+                .userId("11")
+                .grade(Grade.REGULAR)
+                .build();
+
+        Member member = Member.builder()
+                .userId("12")
+                .grade(Grade.REGULAR)
+                .usageTime(Duration.ZERO)
+                .build();
+
+        memberRepository.save(regular);
+        memberRepository.save(member);
+
+        // when & then
+        Assertions.assertThatThrownBy(() ->
+                memberService.increaseUsageTime(regular.getUserId(), member.getUserId(), 100)
+        ).isInstanceOf(IllegalStateException.class);
+    }
+
+
+    @Test
+    @DisplayName("존재하지 않는 사용자의 이용 시간 추가 시 예외 발생")
+    public void increaseUsageTimeUserNotFoundTest() {
+        // given
+        Member admin = Member.builder()
+                .userId("admin")
+                .grade(Grade.ADMIN)
+                .build();
+
+        memberRepository.save(admin);
+
+        // when & then
+        Assertions.assertThatThrownBy(() ->
+                memberService.increaseUsageTime(admin.getUserId(), "no-user", 100)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
 }
+
