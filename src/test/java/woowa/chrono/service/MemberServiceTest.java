@@ -168,8 +168,8 @@ public class MemberServiceTest {
     @DisplayName("REGULAR 사용자가 이용 시간을 수정하면 예외가 발생한다.")
     public void updateUsageTimeForbiddenTest() {
         // given
-        Member regular = Member.builder().userId("regular").grade(Grade.ADMIN).build();
-        Member member = Member.builder().userId("regular").grade(Grade.REGULAR).usageTime(Duration.ofHours(1000))
+        Member regular = Member.builder().userId("regular").grade(Grade.REGULAR).build();
+        Member member = Member.builder().userId("member").grade(Grade.REGULAR).usageTime(Duration.ofHours(1000))
                 .build();
 
         memberRepository.save(regular);

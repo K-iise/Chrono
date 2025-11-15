@@ -66,4 +66,8 @@ public class Member {
     public void addUsageTime(Duration time) {
         this.usageTime = this.usageTime.plus(time);
     }
+
+    public void updateUsageTime(Duration time) {
+        this.usageTime = time;
+    }
 }
