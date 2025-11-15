@@ -104,6 +104,26 @@ public class MemberService {
         return member;
     }
 
+    public Member updatePoint(String adminId, String userId, int point) {
+        if (point <= 0) {
+            throw new IllegalArgumentException("수정하는 포인트는 0보다 커야 합니다.");
+        }
+
+        Member admin = memberRepository.findByUserId(adminId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 관리자입니다.")
+        );
+
+        Member member = memberRepository.findByUserId(userId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 회원입니다.")
+        );
+
+        if (admin.getGrade() != Grade.ADMIN) {
+            throw new IllegalStateException("관리자가 아닌 경우에 포인트를 수정할 수 없습니다.");
+        }
+        member.updatePoint(point);
+        return member;
+    }
+
     private void validateDuplication(Member member) {
         if (memberRepository.findByUserId(member.getUserId()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 멤버입니다.");

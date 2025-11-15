@@ -70,4 +70,8 @@ public class Member {
     public void updateUsageTime(Duration time) {
         this.usageTime = time;
     }
+
+    public void updatePoint(int point) {
+        this.point = point;
+    }
 }
