@@ -43,6 +43,10 @@ public class MemberService {
     }
 
     public Member increaseUsageTime(String adminId, String userId, int time) {
+        if (time <= 0) {
+            throw new IllegalArgumentException("추가 시간은 0보다 커야 합니다.");
+        }
+
         Member admin = memberRepository.findByUserId(adminId).orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 관리자입니다.")
         );
@@ -54,6 +58,7 @@ public class MemberService {
         if (admin.getGrade() != Grade.ADMIN) {
             throw new IllegalStateException("관리자가 아닌 경우 이용 시간을 증가 시킬 수 없습니다.");
         }
+        
         member.addUsageTime(Duration.ofMinutes(time));
         return member;
     }

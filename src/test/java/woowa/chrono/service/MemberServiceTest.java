@@ -145,5 +145,54 @@ public class MemberServiceTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
+    @Test
+    @DisplayName("ADMIN 사용자가 REGULAR 사용자의 이용 시간을 정상적으로 수정한다.")
+    public void updateUsageTimeSuccessTest() {
+        // given
+        Member admin = Member.builder().userId("admin").grade(Grade.ADMIN).build();
+        Member member = Member.builder().userId("regular").grade(Grade.REGULAR).usageTime(Duration.ofHours(1000))
+                .build();
+
+        memberRepository.save(admin);
+        memberRepository.save(member);
+
+        // when
+        int updateTime = 100;
+        Member updated = memberService.updateUsageTime(admin.getUserId(), member.getUserId(), updateTime);
+
+        // then
+        Assertions.assertThat(updated.getUsageTime().toMinutes()).isEqualTo(100);
+    }
+
+    @Test
+    @DisplayName("REGULAR 사용자가 이용 시간을 수정하면 예외가 발생한다.")
+    public void updateUsageTimeForbiddenTest() {
+        // given
+        Member regular = Member.builder().userId("regular").grade(Grade.ADMIN).build();
+        Member member = Member.builder().userId("regular").grade(Grade.REGULAR).usageTime(Duration.ofHours(1000))
+                .build();
+
+        memberRepository.save(regular);
+        memberRepository.save(member);
+
+        // when & then
+        int updateTime = 100;
+        Assertions.assertThatThrownBy(
+                        () -> memberService.updateUsageTime(regular.getUserId(), member.getUserId(), updateTime))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 사용자의 이용 시간 수정 시 예외 발생")
+    public void updateUsageTimeUserNotFoundTest() {
+        // given
+        Member admin = Member.builder().userId("admin").grade(Grade.ADMIN).build();
+        memberRepository.save(admin);
+        int updateTime = 100;
+        // when & then
+        Assertions.assertThatThrownBy(
+                        () -> memberService.updateUsageTime(admin.getUserId(), "test1", updateTime))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
 
