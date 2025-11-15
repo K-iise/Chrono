@@ -35,6 +35,13 @@ public class MemberService {
         return found.getUsageTime();
     }
 
+    public int getPoint(String userId) {
+        Member found = memberRepository.findByUserId(userId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 회원입니다,")
+        );
+        return found.getPoint();
+    }
+
     private void validateDuplication(Member member) {
         if (memberRepository.findByUserId(member.getUserId()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 멤버입니다.");
