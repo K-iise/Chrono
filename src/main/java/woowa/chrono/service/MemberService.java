@@ -84,6 +84,26 @@ public class MemberService {
 
     }
 
+    public Member increasePoint(String adminId, String userId, int addpoint) {
+        if (addpoint <= 0) {
+            throw new IllegalArgumentException("추가하는 포인트는 0보다 커야 합니다.");
+        }
+
+        Member admin = memberRepository.findByUserId(adminId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 관리자입니다.")
+        );
+
+        Member member = memberRepository.findByUserId(userId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 회원입니다.")
+        );
+
+        if (admin.getGrade() != Grade.ADMIN) {
+            throw new IllegalStateException("관리자가 아닌 경우에 포인트 추가를 할 수 없습니다.");
+        }
+        member.addPoint(addpoint);
+        return member;
+    }
+
     private void validateDuplication(Member member) {
         if (memberRepository.findByUserId(member.getUserId()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 멤버입니다.");
