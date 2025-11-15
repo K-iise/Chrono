@@ -59,4 +59,18 @@ public class MemberServiceTest {
         Assertions.assertThat(found).isEqualTo(Duration.ZERO);
     }
 
+    @Test
+    @DisplayName("사용자의 보유 포인트를 조회합니다.")
+    public void getPointTest() {
+        // given
+        Member member = Member.builder().userId("1").userName("홍길동").point(1000).build();
+        memberRepository.save(member);
+
+        // when
+        int found = memberService.getPoint(member.getUserId());
+
+        // then
+        Assertions.assertThat(found).isEqualTo(1000);
+    }
+
 }
