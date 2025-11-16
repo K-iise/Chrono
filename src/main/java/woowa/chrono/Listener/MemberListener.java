@@ -4,15 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.springframework.stereotype.Component;
+import woowa.chrono.domain.Grade;
 import woowa.chrono.domain.Member;
 import woowa.chrono.handler.CommandHandler;
 import woowa.chrono.service.MemberService;
@@ -60,6 +63,12 @@ public class MemberListener extends ListenerAdapter {
         handlerMap.values().forEach(handler -> {
             CommandData cd = Commands.slash(handler.getName(), handler.getDescription())
                     .addOptions(handler.getOptions().toArray(new OptionData[0]));
+
+            // 관리자인 경우만 Permission 설정
+            if (handler.requiredGrade() == Grade.ADMIN) {
+                cd.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR));
+            }
+
             commandData.add(cd);
         });
 

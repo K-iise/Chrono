@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.springframework.stereotype.Component;
+import woowa.chrono.domain.Grade;
 import woowa.chrono.domain.Member;
 import woowa.chrono.handler.CommandHandler;
 import woowa.chrono.service.MemberService;
@@ -29,9 +30,12 @@ public class RegisterCommandHandler implements CommandHandler {
     }
 
     @Override
-    public void handle(SlashCommandInteractionEvent event) {
-        String adminId = event.getUser().getId();
+    public Grade requiredGrade() {
+        return Grade.ADMIN;
+    }
 
+    @Override
+    public void handle(SlashCommandInteractionEvent event) {
         String memberId = event.getOption("user").getAsUser().getId();
         String memberName = event.getOption("user").getAsUser().getName();
 

@@ -30,12 +30,17 @@ public class RoleCommandHandler implements CommandHandler {
     }
 
     @Override
+    public Grade requiredGrade() {
+        return Grade.ADMIN;
+    }
+
+    @Override
     public void handle(SlashCommandInteractionEvent event) {
         String userId = event.getOption("user").getAsUser().getId();
         Role role = event.getOption("role").getAsRole();
         Grade grade = Grade.fromRoleName(role.getName());
         memberService.updateMemberGrade(userId, grade);
-        
+
         event.reply(event.getOption("user").getAsUser().getAsMention() +
                 "님의 등급이 " + grade.getDisplayName() + "으로 변경되었습니다.").queue();
     }
