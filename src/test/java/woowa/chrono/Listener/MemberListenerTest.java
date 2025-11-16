@@ -1,5 +1,6 @@
 package woowa.chrono.Listener;
 
+import java.util.List;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import woowa.chrono.handler.CommandHandler;
 import woowa.chrono.repository.MemberRepository;
 import woowa.chrono.service.MemberService;
 
@@ -26,13 +28,15 @@ public class MemberListenerTest {
 
     @Mock
     MemberService memberService;
-    
+
     MemberListener memberListener;
 
+    @Mock
+    List<CommandHandler> handlerMap;
 
     @BeforeEach
     public void setUp() {
-        memberListener = new MemberListener(memberService);
+        memberListener = new MemberListener(memberService, handlerMap);
     }
 
     @Test

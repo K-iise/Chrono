@@ -2,6 +2,8 @@ package woowa.chrono.Listener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -10,20 +12,25 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.springframework.stereotype.Component;
 import woowa.chrono.domain.Member;
+import woowa.chrono.handler.CommandHandler;
 import woowa.chrono.service.MemberService;
 
 @Component
 public class MemberListener extends ListenerAdapter {
 
+    private final Map<String, CommandHandler> handlerMap;
+
     private final MemberService memberService;
 
-    public MemberListener(MemberService memberService) {
+    public MemberListener(MemberService memberService, List<CommandHandler> handlers) {
         this.memberService = memberService;
+        this.handlerMap = handlers.stream()
+                .collect(Collectors.toMap(CommandHandler::getName, h -> h));
     }
 
     @Override
@@ -56,34 +63,27 @@ public class MemberListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        switch (event.getName()) {
-            case "ping":
-                event.reply("**Pong!**").queue();
-                break;
-            case "role":
-                event.reply("**role!**").queue();
-                break;
-            case "register":
-                event.reply("**register!**").queue();
-                break;
+        CommandHandler handler = handlerMap.get(event.getName());
+
+        if (handler == null) {
+            event.reply("지원하지 않는 명령어입니다.").queue();
+            return;
         }
+
+        handler.handle(event);
     }
 
     @Override
     public void onGuildReady(GuildReadyEvent event) {
-        List<CommandData> commandDatas = new ArrayList<>();
-        commandDatas.add(
-                Commands.slash("ping", "Pong을 해줍니다.")
-        );
-        commandDatas.add(
-                Commands.slash("reply", "Reply를 해줍니다.")
-        );
-        commandDatas.add(
-                Commands.slash("register", "멤버를 등록합니다.")
-                        .addOption(OptionType.STRING, "userId", "사용자 ID", true)
+        List<CommandData> commandData = new ArrayList<>();
 
-        );
+        handlerMap.values().forEach(handler -> {
+            CommandData cd = Commands.slash(handler.getName(), handler.getDescription())
+                    .addOptions(handler.getOptions().toArray(new OptionData[0]));
+            commandData.add(cd);
+        });
 
-        event.getGuild().updateCommands().addCommands(commandDatas).queue();
+        event.getGuild().updateCommands().addCommands(commandData).queue();
     }
+
 }
