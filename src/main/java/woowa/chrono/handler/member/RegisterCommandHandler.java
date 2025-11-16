@@ -36,16 +36,22 @@ public class RegisterCommandHandler implements CommandHandler {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
-        String memberId = event.getOption("user").getAsUser().getId();
-        String memberName = event.getOption("user").getAsUser().getName();
+        try {
+            String memberId = event.getOption("user").getAsUser().getId();
+            String memberName = event.getOption("user").getAsUser().getName();
 
-        Member member = Member.builder()
-                .userId(memberId)
-                .userName(memberName)
-                .build();
+            Member member = Member.builder()
+                    .userId(memberId)
+                    .userName(memberName)
+                    .build();
 
-        memberService.registerMember(member);
-        event.reply("등록 완료!").queue();
+            memberService.registerMember(member);
+
+            event.reply("등록 완료!").queue();
+
+        } catch (IllegalStateException e) {
+            event.reply("❌ " + e.getMessage()).setEphemeral(true).queue();
+        }
     }
 
     @Override

@@ -36,11 +36,27 @@ public class RoleCommandHandler implements CommandHandler {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
+        String callerId = event.getUser().getId();
+        Grade callerGrade = memberService.findMemberOrThrow(callerId).getGrade();
+
+        if (callerGrade != Grade.ADMIN) {
+            event.reply("이 명령어는 관리자만 사용할 수 있습니다.").setEphemeral(true).queue();
+            return;
+        }
+
         String userId = event.getOption("user").getAsUser().getId();
         Role role = event.getOption("role").getAsRole();
         Grade grade = Grade.fromRoleName(role.getName());
         memberService.updateMemberGrade(userId, grade);
 
+        List<String> gradeRoles = List.of("뉴비", "멤버", "관리자");
+        
+        event.getGuild().retrieveMemberById(userId).queue(member -> {
+            member.getRoles().stream()
+                    .filter(r -> gradeRoles.contains(r.getName()))
+                    .forEach(r -> event.getGuild().removeRoleFromMember(member, r).queue());
+            event.getGuild().addRoleToMember(member, role).queue();
+        });
         event.reply(event.getOption("user").getAsUser().getAsMention() +
                 "님의 등급이 " + grade.getDisplayName() + "으로 변경되었습니다.").queue();
     }

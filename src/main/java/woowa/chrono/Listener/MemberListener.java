@@ -71,7 +71,7 @@ public class MemberListener extends ListenerAdapter {
 
             commandData.add(cd);
         });
-
+        
         event.getGuild().updateCommands().addCommands(commandData).queue();
     }
 

@@ -92,11 +92,11 @@ public class MemberService {
 
     private void validateDuplication(Member member) {
         if (memberRepository.findByUserId(member.getUserId()).isPresent()) {
-            throw new IllegalArgumentException(ErrorCode.DUPLICATE_MEMBER.getMessage());
+            throw new IllegalStateException(ErrorCode.DUPLICATE_MEMBER.getMessage());
         }
     }
 
-    private Member findMemberOrThrow(String userId) {
+    public Member findMemberOrThrow(String userId) {
         return memberRepository.findByUserId(userId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorCode.MEMBER_NOT_FOUND.getMessage())
         );
