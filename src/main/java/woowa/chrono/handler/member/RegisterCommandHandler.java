@@ -4,6 +4,7 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.stereotype.Component;
 import woowa.chrono.domain.Grade;
 import woowa.chrono.domain.Member;
@@ -57,5 +58,10 @@ public class RegisterCommandHandler implements CommandHandler {
     @Override
     public List<OptionData> getOptions() {
         return List.of(new OptionData(OptionType.USER, "user", "등록할 사용자", true));
+    }
+
+    @Override
+    public List<SubcommandData> getSubcommands() {
+        return List.of();
     }
 }

@@ -62,8 +62,8 @@ public class MemberListener extends ListenerAdapter {
 
         handlerMap.values().forEach(handler -> {
             CommandData cd = Commands.slash(handler.getName(), handler.getDescription())
-                    .addOptions(handler.getOptions().toArray(new OptionData[0]));
-
+                    .addOptions(handler.getOptions().toArray(new OptionData[0]))
+                    .addSubcommands(handler.getSubcommands());
             // 관리자인 경우만 Permission 설정
             if (handler.requiredGrade() == Grade.ADMIN) {
                 cd.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR));
@@ -71,7 +71,7 @@ public class MemberListener extends ListenerAdapter {
 
             commandData.add(cd);
         });
-        
+
         event.getGuild().updateCommands().addCommands(commandData).queue();
     }
 

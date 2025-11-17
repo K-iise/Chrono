@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.stereotype.Component;
 import woowa.chrono.domain.Grade;
 import woowa.chrono.handler.CommandHandler;
@@ -50,7 +51,7 @@ public class RoleCommandHandler implements CommandHandler {
         memberService.updateMemberGrade(userId, grade);
 
         List<String> gradeRoles = List.of("뉴비", "멤버", "관리자");
-        
+
         event.getGuild().retrieveMemberById(userId).queue(member -> {
             member.getRoles().stream()
                     .filter(r -> gradeRoles.contains(r.getName()))
@@ -65,5 +66,10 @@ public class RoleCommandHandler implements CommandHandler {
     public List<OptionData> getOptions() {
         return List.of(new OptionData(OptionType.USER, "user", "등급을 변경할 사용자", true),
                 new OptionData(OptionType.ROLE, "role", "변경할 등급", true));
+    }
+
+    @Override
+    public List<SubcommandData> getSubcommands() {
+        return List.of();
     }
 }
