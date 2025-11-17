@@ -74,4 +74,5 @@ public class Member {
     public void updatePoint(int point) {
         this.point = point;
     }
+
 }

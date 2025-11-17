@@ -38,13 +38,17 @@ public class UsageTimeCommandHandler implements CommandHandler {
             event.reply("유효하지 않은 명령어입니다.").setEphemeral(true).queue();
             return;
         }
-
+        switch (subCommand) {
+            case "get" -> handleGet(event);
+            default -> event.reply("알 수 없는 명령어입니다.").queue();
+        }
     }
 
     private void handleGet(SlashCommandInteractionEvent event) {
         String userId = event.getOption("user").getAsUser().getId();
         Duration time = memberService.getUsageTime(userId);
-
+        event.reply(event.getOption("user").getAsUser().getAsMention() + "님이 보유한 이용 시간은 " +
+                formatDuration(time) + "입니다.").queue();
     }
 
     @Override
@@ -70,6 +74,26 @@ public class UsageTimeCommandHandler implements CommandHandler {
                                 new OptionData(OptionType.INTEGER, "amount", "설정할 시간", true)
                         )
         );
+    }
+
+    public static String formatDuration(Duration duration) {
+        long seconds = duration.getSeconds();
+
+        long hours = seconds / 3600;
+        long minutes = (seconds % 3600) / 60;
+        long secs = seconds % 60;
+
+        StringBuilder sb = new StringBuilder();
+        if (hours > 0) {
+            sb.append(hours).append("시간 ");
+        }
+        if (minutes > 0) {
+            sb.append(minutes).append("분 ");
+        }
+        if (secs > 0 || sb.length() == 0) {
+            sb.append(secs).append("초");
+        }
+        return sb.toString().trim();
     }
 
     @Override
