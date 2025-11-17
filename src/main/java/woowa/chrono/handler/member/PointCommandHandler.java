@@ -68,11 +68,18 @@ public class PointCommandHandler implements CommandHandler {
     }
 
     private void handleRemove(SlashCommandInteractionEvent event) {
-        // 삭제 로직
+        
     }
 
     private void handleSet(SlashCommandInteractionEvent event) {
-        // 설정 로직
+        String adminId = event.getUser().getId();
+        String userId = event.getOption("user").getAsUser().getId();
+        int updatePoint = event.getOption("amount").getAsInt();
+        Member member = memberService.updatePoint(adminId, userId, updatePoint);
+
+        event.reply(event.getOption("user").getAsUser().getAsMention() +
+                "님의 포인트가 **" + updatePoint + "**(으)로 설정되었습니다.\n" +
+                "현재 포인트: " + member.getPoint()).queue();
     }
 
     @Override

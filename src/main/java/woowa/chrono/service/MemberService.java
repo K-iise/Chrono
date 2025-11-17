@@ -85,7 +85,7 @@ public class MemberService {
     }
 
     private void validatePositivePoint(int point) {
-        if (point <= 0) {
+        if (point < 0) {
             throw new IllegalArgumentException(ErrorCode.INVALID_POINT.getMessage());
         }
     }

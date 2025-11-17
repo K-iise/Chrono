@@ -59,7 +59,7 @@ public class RoleCommandHandler implements CommandHandler {
             event.getGuild().addRoleToMember(member, role).queue();
         });
         event.reply(event.getOption("user").getAsUser().getAsMention() +
-                "님의 등급이 " + grade.getDisplayName() + "으로 변경되었습니다.").queue();
+                "님의 등급이 **" + grade.getDisplayName() + "**(으)로 변경되었습니다.").queue();
     }
 
     @Override
