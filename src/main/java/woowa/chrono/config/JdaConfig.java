@@ -6,15 +6,22 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import woowa.chrono.Listener.CommandListener;
 import woowa.chrono.Listener.MemberListener;
+import woowa.chrono.Listener.StudyRecordListener;
 
 @Configuration
 public class JdaConfig {
 
+    private final CommandListener commandListener;
     private final MemberListener memberListener;
+    private final StudyRecordListener studyRecordListener;
 
-    public JdaConfig(MemberListener memberListener) {
+    public JdaConfig(CommandListener commandListener, MemberListener memberListener,
+                     StudyRecordListener studyRecordListener) {
+        this.commandListener = commandListener;
         this.memberListener = memberListener;
+        this.studyRecordListener = studyRecordListener;
     }
 
     @Bean
@@ -28,7 +35,9 @@ public class JdaConfig {
                 GatewayIntent.GUILD_VOICE_STATES); // 음성 채널 상태 확인용 인텐트
 
         // Listener 등록
+        jdaBuilder.addEventListeners(commandListener);
         jdaBuilder.addEventListeners(memberListener);
+        jdaBuilder.addEventListeners(studyRecordListener);
 
         return jdaBuilder;
     }

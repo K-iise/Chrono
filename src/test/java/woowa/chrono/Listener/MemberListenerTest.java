@@ -36,7 +36,7 @@ public class MemberListenerTest {
 
     @BeforeEach
     public void setUp() {
-        memberListener = new MemberListener(memberService, handlerMap);
+        memberListener = new MemberListener(memberService);
     }
 
     @Test

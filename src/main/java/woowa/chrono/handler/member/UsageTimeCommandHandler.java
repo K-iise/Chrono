@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import woowa.chrono.domain.Grade;
 import woowa.chrono.handler.CommandHandler;
 import woowa.chrono.service.MemberService;
+import woowa.chrono.util.DurationUtils;
 
 @Component
 public class UsageTimeCommandHandler implements CommandHandler {
@@ -48,7 +49,7 @@ public class UsageTimeCommandHandler implements CommandHandler {
         String userId = event.getOption("user").getAsUser().getId();
         Duration time = memberService.getUsageTime(userId);
         event.reply(event.getOption("user").getAsUser().getAsMention() + "님이 보유한 이용 시간은 " +
-                formatDuration(time) + "입니다.").queue();
+                DurationUtils.format(time) + "입니다.").queue();
     }
 
     @Override
@@ -74,26 +75,6 @@ public class UsageTimeCommandHandler implements CommandHandler {
                                 new OptionData(OptionType.INTEGER, "amount", "설정할 시간", true)
                         )
         );
-    }
-
-    public static String formatDuration(Duration duration) {
-        long seconds = duration.getSeconds();
-
-        long hours = seconds / 3600;
-        long minutes = (seconds % 3600) / 60;
-        long secs = seconds % 60;
-
-        StringBuilder sb = new StringBuilder();
-        if (hours > 0) {
-            sb.append(hours).append("시간 ");
-        }
-        if (minutes > 0) {
-            sb.append(minutes).append("분 ");
-        }
-        if (secs > 0 || sb.length() == 0) {
-            sb.append(secs).append("초");
-        }
-        return sb.toString().trim();
     }
 
     @Override
