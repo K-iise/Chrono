@@ -6,10 +6,24 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.stereotype.Component;
 import woowa.chrono.domain.Grade;
+import woowa.chrono.domain.Member;
+import woowa.chrono.domain.StudyRecord;
 import woowa.chrono.handler.CommandHandler;
+import woowa.chrono.service.MemberService;
+import woowa.chrono.service.StudyRecordService;
+import woowa.chrono.util.DurationUtils;
 
 @Component
 public class RecordCommandHandler implements CommandHandler {
+
+    private final StudyRecordService studyRecordService;
+    private final MemberService memberService;
+
+    public RecordCommandHandler(StudyRecordService studyRecordService, MemberService memberService) {
+        this.studyRecordService = studyRecordService;
+        this.memberService = memberService;
+    }
+
     @Override
     public String getName() {
         return "record";
@@ -37,11 +51,18 @@ public class RecordCommandHandler implements CommandHandler {
     }
 
     private void handleStart(SlashCommandInteractionEvent event) {
-
+        String userId = event.getUser().getId();
+        Member member = memberService.findMemberOrThrow(userId);
+        studyRecordService.startStudy(member);
+        event.reply(event.getUser().getAsMention() + "님이 공부를 시작합니다.").queue();
     }
 
     private void handleEnd(SlashCommandInteractionEvent event) {
+        String userId = event.getUser().getId();
+        StudyRecord studyRecord = studyRecordService.endStudy(userId);
 
+        event.reply(event.getUser().getAsMention() + "님이 공부를 종료했습니다.\n" +
+                "이용한 시간 : " + DurationUtils.format(studyRecord.getSessionTime())).queue();
     }
 
     @Override
