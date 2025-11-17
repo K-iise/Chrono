@@ -10,6 +10,7 @@ import woowa.chrono.domain.Grade;
 import woowa.chrono.domain.Member;
 import woowa.chrono.handler.CommandHandler;
 import woowa.chrono.service.MemberService;
+import woowa.chrono.util.DurationUtils;
 
 @Component
 public class PointCommandHandler implements CommandHandler {
@@ -42,7 +43,7 @@ public class PointCommandHandler implements CommandHandler {
         switch (subCommand) {
             case "get" -> handleGet(event);
             case "add" -> handleAdd(event);
-            case "remove" -> handleRemove(event);
+            case "use" -> handleUse(event);
             case "set" -> handleSet(event);
             default -> event.reply("알 수 없는 명령어입니다.").queue();
         }
@@ -70,13 +71,21 @@ public class PointCommandHandler implements CommandHandler {
         Member member = memberService.increasePoint(adminId, userId, addPoint);
 
         event.reply(event.getOption("user").getAsUser().getAsMention() +
-                        "님에게 " + addPoint + " 포인트가 추가되었습니다.\n" +
+                        "님에게 **" + addPoint + "** 포인트가 추가되었습니다.\n" +
                         "현재 포인트: " + member.getPoint())
                 .queue();
     }
 
-    private void handleRemove(SlashCommandInteractionEvent event) {
+    private void handleUse(SlashCommandInteractionEvent event) {
+        String userId = event.getUser().getId();
+        int usePoint = event.getOption("amount").getAsInt();
+        Member member = memberService.purchaseUsageTime(userId, usePoint);
 
+        String formatted = DurationUtils.format(member.getUsageTime());
+
+        event.reply(event.getUser().getAsMention() +
+                "님의 현재 남은 포인트는 **" + member.getPoint() + "** 입니다.\n" +
+                "남은 이용 시간: " + formatted).queue();
     }
 
     private void handleSet(SlashCommandInteractionEvent event) {
@@ -120,10 +129,10 @@ public class PointCommandHandler implements CommandHandler {
                                 new OptionData(OptionType.USER, "user", "추가할 사용자", true),
                                 new OptionData(OptionType.INTEGER, "amount", "추가할 양", true)
                         ),
-                new SubcommandData("remove", "포인트 차감")
+                new SubcommandData("use", "포인트 사용")
                         .addOptions(
-                                new OptionData(OptionType.USER, "user", "차감할 사용자", true),
-                                new OptionData(OptionType.INTEGER, "amount", "차감할 양", true)
+                                new OptionData(OptionType.INTEGER, "amount", "포인트 구매 단위는 1000P당 1시간 이용 시간이 충전됩니다.",
+                                        true)
                         ),
                 new SubcommandData("set", "포인트 설정")
                         .addOptions(

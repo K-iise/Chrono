@@ -85,6 +85,7 @@ public class MemberService {
         }
 
         Member member = findMemberOrThrow(userId);
+        member.usePoint(point);
         int requiredTimes = point / POINT_PER_HOUR;
         member.addUsageTime(Duration.ofHours(requiredTimes));
 
