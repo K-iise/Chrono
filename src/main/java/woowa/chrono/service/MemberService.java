@@ -12,6 +12,7 @@ import woowa.chrono.repository.MemberRepository;
 @Transactional
 public class MemberService {
 
+    private static final int POINT_PER_HOUR = 1000;
     private final MemberRepository memberRepository;
 
     public MemberService(MemberRepository memberRepository) {
@@ -48,7 +49,6 @@ public class MemberService {
         return member;
     }
 
-
     public Member updateUsageTime(String adminId, String userId, int time) {
         validatePositiveTime(time);
         requireAdmin(adminId);
@@ -75,6 +75,19 @@ public class MemberService {
         Member member = findMemberOrThrow(userId);
 
         member.updatePoint(point);
+        return member;
+    }
+
+    // 포인트로 이용 시간 구매 기능
+    public Member purchaseUsageTime(String userId, int point) {
+        if (point % POINT_PER_HOUR != 0) {
+            throw new IllegalArgumentException("포인트의 구매 단위는 " + POINT_PER_HOUR + "입니다.");
+        }
+
+        Member member = findMemberOrThrow(userId);
+        int requiredTimes = point / POINT_PER_HOUR;
+        member.addUsageTime(Duration.ofHours(requiredTimes));
+
         return member;
     }
 
