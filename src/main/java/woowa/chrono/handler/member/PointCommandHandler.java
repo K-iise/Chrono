@@ -56,6 +56,14 @@ public class PointCommandHandler implements CommandHandler {
     }
 
     private void handleAdd(SlashCommandInteractionEvent event) {
+        String callerId = event.getUser().getId();
+        Grade callerGrade = memberService.findMemberOrThrow(callerId).getGrade();
+
+        if (callerGrade != Grade.ADMIN) {
+            event.reply("이 명령어는 관리자만 사용할 수 있습니다.").setEphemeral(true).queue();
+            return;
+        }
+
         String adminId = event.getUser().getId();
         String userId = event.getOption("user").getAsUser().getId();
         int addPoint = event.getOption("amount").getAsInt();
@@ -68,10 +76,18 @@ public class PointCommandHandler implements CommandHandler {
     }
 
     private void handleRemove(SlashCommandInteractionEvent event) {
-        
+
     }
 
     private void handleSet(SlashCommandInteractionEvent event) {
+        String callerId = event.getUser().getId();
+        Grade callerGrade = memberService.findMemberOrThrow(callerId).getGrade();
+
+        if (callerGrade != Grade.ADMIN) {
+            event.reply("이 명령어는 관리자만 사용할 수 있습니다.").setEphemeral(true).queue();
+            return;
+        }
+
         String adminId = event.getUser().getId();
         String userId = event.getOption("user").getAsUser().getId();
         int updatePoint = event.getOption("amount").getAsInt();
