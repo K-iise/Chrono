@@ -24,9 +24,21 @@ public class StudyRecordService {
         studyReadyMap = new ConcurrentHashMap<>();
     }
 
-    public void startStudy(Member member) {
+    public void startStudy(String userId) {
+
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalStateException("등록된 멤버가 아닙니다."));
+
+        if (member.getUsageTime().isNegative()) {
+            throw new IllegalStateException("잔여 이용 시간이 없습니다.");
+        }
+
+        if (studyReadyMap.containsKey(userId)) {
+            throw new IllegalStateException("이미 공부를 시작했습니다.");
+        }
+
         LocalDateTime startTime = LocalDateTime.now();
-        studyReadyMap.put(member.getUserId(), startTime);
+        studyReadyMap.put(userId, startTime);
     }
 
     public StudyRecord endStudy(String userId) {

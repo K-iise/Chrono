@@ -46,9 +46,9 @@ public class UsageTimeCommandHandler implements CommandHandler {
     }
 
     private void handleGet(SlashCommandInteractionEvent event) {
-        String userId = event.getOption("user").getAsUser().getId();
+        String userId = event.getUser().getId();
         Duration time = memberService.getUsageTime(userId);
-        event.reply(event.getOption("user").getAsUser().getAsMention() + "님이 보유한 이용 시간은 " +
+        event.reply(event.getUser().getAsMention() + "님이 보유한 이용 시간은 " +
                 DurationUtils.format(time) + "입니다.").queue();
     }
 
@@ -60,10 +60,7 @@ public class UsageTimeCommandHandler implements CommandHandler {
     @Override
     public List<SubcommandData> getSubcommands() {
         return List.of(
-                new SubcommandData("get", "사용자의 이용 시간을 조회합니다.")
-                        .addOptions(
-                                new OptionData(OptionType.USER, "user", "조회할 사용자", false)
-                        ),
+                new SubcommandData("get", "사용자의 이용 시간을 조회합니다."),
                 new SubcommandData("add", "사용자의 이용 시간을 추가합니다.")
                         .addOptions(
                                 new OptionData(OptionType.USER, "user", "추가할 사용자", true),
