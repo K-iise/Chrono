@@ -17,7 +17,11 @@ public class StudyRecordListener extends ListenerAdapter {
         this.studyRecordService = studyRecordService;
     }
 
-    // 사용자가 음성 채널에 들어가거나 나갈 때 발생하는 이벤트.
+    /**
+     * 사용자가 음성 채널에 입장하거나 퇴장할 때 발생하는 이벤트
+     *
+     * @param event
+     */
     @Override
     public void onGuildVoiceUpdate(GuildVoiceUpdateEvent event) {
         User user = event.getEntity().getUser();

@@ -82,7 +82,7 @@ public class MemberService {
 
     public Member purchaseUsageTime(String userId, int point) {
         if (point % POINT_PER_HOUR != 0) {
-            throw new IllegalArgumentException("포인트의 구매 단위는 " + POINT_PER_HOUR + "입니다.");
+            throw new IllegalArgumentException("[ERROR] 포인트의 구매 단위는 " + POINT_PER_HOUR + "입니다.");
         }
 
         Member member = findMemberOrThrow(userId);
