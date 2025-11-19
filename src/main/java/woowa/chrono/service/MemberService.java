@@ -117,7 +117,7 @@ public class MemberService {
         );
     }
 
-    private void requireAdmin(String adminId) {
+    public void requireAdmin(String adminId) {
         Member admin = memberRepository.findByUserId(adminId).orElseThrow(
                 () -> new IllegalArgumentException(ErrorCode.ADMIN_NOT_FOUND.getMessage())
         );

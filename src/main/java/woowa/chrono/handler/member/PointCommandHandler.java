@@ -50,10 +50,26 @@ public class PointCommandHandler implements CommandHandler {
     }
 
     private void handleGet(SlashCommandInteractionEvent event) {
-        String userId = event.getOption("user").getAsUser().getId();
-        int point = memberService.getPoint(userId);
-        event.reply(event.getOption("user").getAsUser().getAsMention() + "님이 보유한 포인트는 " +
-                point + "입니다.").queue();
+        try {
+            // 선택한 유저(Option)이 있는지 확인한다.
+            var optionUser = event.getOption("user");
+
+            // 남의 포인트 조회 시 관리자인지 확인
+            if (optionUser != null) {
+                memberService.requireAdmin(event.getUser().getId());
+            }
+
+            String targetUserId = (optionUser != null) ? optionUser.getAsUser().getId() : event.getUser().getId();
+            String mention =
+                    (optionUser != null) ? optionUser.getAsUser().getAsMention() : event.getUser().getAsMention();
+
+            // 선택된 유저의 포인트를 조회한다.
+            int point = memberService.getPoint(targetUserId);
+            event.reply(mention + "님이 보유한 포인트는 " +
+                    point + "입니다.").queue();
+        } catch (RuntimeException e) {
+            event.reply(e.getMessage()).setEphemeral(true).queue();
+        }
     }
 
     private void handleAdd(SlashCommandInteractionEvent event) {
