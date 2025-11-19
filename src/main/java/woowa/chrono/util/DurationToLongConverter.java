@@ -1,4 +1,4 @@
-package woowa.chrono.domain;
+package woowa.chrono.util;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

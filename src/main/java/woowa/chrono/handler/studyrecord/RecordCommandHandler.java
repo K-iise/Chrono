@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.stereotype.Component;
 import woowa.chrono.domain.Grade;
+import woowa.chrono.domain.Member;
 import woowa.chrono.domain.StudyRecord;
 import woowa.chrono.handler.CommandHandler;
 import woowa.chrono.service.MemberService;
@@ -52,13 +53,11 @@ public class RecordCommandHandler implements CommandHandler {
     private void handleStart(SlashCommandInteractionEvent event) {
         try {
             String userId = event.getUser().getId();
-            studyRecordService.startStudy(userId);
+            Member member = studyRecordService.startStudy(userId, event.getChannelId());
             event.reply(event.getUser().getAsMention() + "님이 공부를 시작합니다.").queue();
         } catch (IllegalStateException e) {
             event.reply(e.getMessage()).queue();
         }
-
-
     }
 
     private void handleEnd(SlashCommandInteractionEvent event) {

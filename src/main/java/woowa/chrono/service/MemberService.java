@@ -12,7 +12,9 @@ import woowa.chrono.repository.MemberRepository;
 @Transactional
 public class MemberService {
 
+    // 포인트로 구매 가능한 시간 단위 (1시간 = 1000포인트)
     private static final int POINT_PER_HOUR = 1000;
+
     private final MemberRepository memberRepository;
 
     public MemberService(MemberRepository memberRepository) {
@@ -78,7 +80,6 @@ public class MemberService {
         return member;
     }
 
-    // 포인트로 이용 시간 구매 기능
     public Member purchaseUsageTime(String userId, int point) {
         if (point % POINT_PER_HOUR != 0) {
             throw new IllegalArgumentException("포인트의 구매 단위는 " + POINT_PER_HOUR + "입니다.");
