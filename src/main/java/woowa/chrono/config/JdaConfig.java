@@ -36,7 +36,9 @@ public class JdaConfig {
                 GatewayIntent.GUILD_MESSAGES,      // 서버 메시지 읽기
                 GatewayIntent.MESSAGE_CONTENT,     // 메시지 내용 읽기
                 GatewayIntent.GUILD_VOICE_STATES,  // 음성 채널 상태 확인용 인텐트
-                GatewayIntent.SCHEDULED_EVENTS);   // 길드 이벤트 추적 인텐트
+                GatewayIntent.SCHEDULED_EVENTS,    // 길드 이벤트 추적 인텐트
+                GatewayIntent.GUILD_MESSAGE_REACTIONS
+        );
 
         // Listener 등록
         jdaBuilder.addEventListeners(commandListener);
