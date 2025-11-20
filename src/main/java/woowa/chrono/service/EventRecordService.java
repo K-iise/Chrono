@@ -26,10 +26,11 @@ public class EventRecordService {
         Member member = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalStateException("등록된 회원이 아닙니다."));
 
-        Event event = eventRecordRepository.findByeventLocation(eventLocation)
-                .orElseTrow(() -> new IllegalStateException("등록된 이벤트가 아닙니다."));
+        Event event = eventRepository.findByEventLocation(eventLocation)
+                .orElseThrow(() -> new IllegalStateException("등록된 이벤트가 아닙니다."));
 
-        EventRecord eventRecord = EventRecord.builder().member(member).event(event).participationTime(LocalDateTime.now()).build();
-        eventRecordRepository.save()
+        EventRecord eventRecord = EventRecord.builder().member(member).event(event)
+                .participationTime(LocalDateTime.now()).build();
+        eventRecordRepository.save(eventRecord);
     }
 }
