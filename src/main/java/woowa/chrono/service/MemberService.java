@@ -86,6 +86,10 @@ public class MemberService {
         }
 
         Member member = findMemberOrThrow(userId);
+        if (member.getPoint() < point) {
+            throw new IllegalArgumentException("[ERROR] 보유 포인트(" + member.getPoint() + ")가 부족합니다. 요청: " + point);
+        }
+        
         member.usePoint(point);
         int requiredTimes = point / POINT_PER_HOUR;
         member.addUsageTime(Duration.ofHours(requiredTimes));

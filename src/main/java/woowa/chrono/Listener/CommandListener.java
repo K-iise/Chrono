@@ -44,8 +44,9 @@ public class CommandListener extends ListenerAdapter {
         handlerMap.values().forEach(handler -> {
             CommandData cd = Commands.slash(handler.getName(), handler.getDescription())
                     .addOptions(handler.getOptions().toArray(new OptionData[0]))
-                    .addSubcommands(handler.getSubcommands());
-
+                    .addSubcommands(handler.getSubcommands())
+                    .addSubcommandGroups(handler.getSubcommandGroups());
+            
             // 관리자인 경우만 Permission 설정
             // 일반 멤버는 눌러도 비활성화 됨
             if (handler.requiredGrade() == Grade.ADMIN) {
