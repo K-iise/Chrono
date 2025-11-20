@@ -26,15 +26,15 @@ public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(name = "event_id", unique = true, nullable = false)
-    private String eventId;
 
     @ManyToOne
     @JoinColumn(name = "admin_id", nullable = false)
     private Member admin;
 
-    @Column(name = "content")
+    @Column(name = "title", nullable = false)
+    private String title;
+
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "start_time", nullable = false)
