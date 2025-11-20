@@ -37,6 +37,9 @@ public class Event {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
+    @Column(name = "event_location", unique = true)
+    private String eventLocation;
+
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 

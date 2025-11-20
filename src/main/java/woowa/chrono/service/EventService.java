@@ -18,12 +18,13 @@ public class EventService {
     }
 
     // 등록한 이벤트를 DB에 저장하는 기능
-    public void registerEvent(String adminId, String title, String content, LocalDateTime startTime,
+    public void registerEvent(String adminId, String title, String content, String location, LocalDateTime startTime,
                               LocalDateTime endTime) {
         Member admin = memberRepository.findByUserId(adminId)
                 .orElseThrow(() -> new IllegalStateException("등록된 관리자가 아닙니다."));
 
-        Event event = Event.builder().admin(admin).title(title).content(content).startTime(startTime).endTime(endTime)
+        Event event = Event.builder().admin(admin).title(title).content(content).eventLocation(location)
+                .startTime(startTime).endTime(endTime)
                 .build();
 
         eventRepository.save(event);

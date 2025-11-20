@@ -5,15 +5,18 @@ import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventCreateEvent
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventUserAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.springframework.stereotype.Component;
+import woowa.chrono.service.EventRecordService;
 import woowa.chrono.service.EventService;
 
 @Component
 public class EventListener extends ListenerAdapter {
 
     private final EventService eventService;
+    private final EventRecordService eventRecordService;
 
-    public EventListener(EventService eventService) {
+    public EventListener(EventService eventService, EventRecordService eventRecordService) {
         this.eventService = eventService;
+        this.eventRecordService = eventRecordService;
     }
 
     // 디스코드 서버에서 새로운 이벤트를 DB에 등록하기 위한 이벤트.
@@ -27,20 +30,17 @@ public class EventListener extends ListenerAdapter {
         String location = event.getScheduledEvent().getLocation();
 
         System.out.println("location = " + location);
-        eventService.registerEvent(userId, title, content, startTime, endTime);
+        eventService.registerEvent(userId, title, content, location, startTime, endTime);
     }
 
     // 디스코드 서버에서 이벤트에 참가하기 위한 이벤트.
     @Override
     public void onScheduledEventUserAdd(ScheduledEventUserAddEvent event) {
         String userid = event.getUserId();
-        String name = event.getScheduledEvent().getName();
-        String detail = event.getScheduledEvent().getDescription();
         String location = event.getScheduledEvent().getLocation();
 
+        eventRecordService.participateEvent(userid, location);
         System.out.println("userid = " + userid);
-        System.out.println("name = " + name);
-        System.out.println("detail = " + detail);
         System.out.println("location = " + location);
     }
 }
