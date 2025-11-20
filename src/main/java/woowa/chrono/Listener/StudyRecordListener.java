@@ -24,6 +24,7 @@ public class StudyRecordListener extends ListenerAdapter {
      */
     @Override
     public void onGuildVoiceUpdate(GuildVoiceUpdateEvent event) {
+
         User user = event.getEntity().getUser();
         var userId = user.getId();
         var joinedChannel = event.getChannelJoined();
@@ -31,26 +32,30 @@ public class StudyRecordListener extends ListenerAdapter {
 
         TextChannel recordChannel = event.getGuild().getTextChannelById("1440644403398967376");
 
-        // 사용자가 새로운 채널에 입장한 경우
-        if (joinedChannel != null && leftChannel == null) {
-            var channelId = joinedChannel.getId();
-            studyRecordService.startStudy(userId, channelId);
+        try {
+            // 사용자가 새로운 채널에 입장한 경우
+            if (joinedChannel != null && leftChannel == null) {
+                var channelId = recordChannel.getId();
+                studyRecordService.startStudy(userId, channelId);
 
-            // 사용자의 텍스트 채널에 시작 메시지를 보낸다.
-            if (recordChannel != null) {
-                recordChannel.sendMessage(user.getAsMention() + "님이 학습을 시작합니다.").queue();
+                // 사용자의 텍스트 채널에 시작 메시지를 보낸다.
+                if (recordChannel != null) {
+                    recordChannel.sendMessage(user.getAsMention() + "님이 학습을 시작합니다.").queue();
+                }
             }
-        }
 
-        // 사용자가 채널에 나간 경우
-        if (joinedChannel == null && leftChannel != null) {
-            StudyRecord studyRecord = studyRecordService.endStudy(userId);
+            // 사용자가 채널에 나간 경우
+            if (joinedChannel == null && leftChannel != null && studyRecordService.endStudyIfActive(userId)) {
+                StudyRecord studyRecord = studyRecordService.endStudy(userId);
 
-            // 사용자의 텍스트 채널에 종료 메시지를 보낸다.
-            if (recordChannel != null) {
-                recordChannel.sendMessage(user.getAsMention() + "님의 학습이 종료되었습니다.\n" +
-                        "이용한 시간 : " + DurationUtils.format(studyRecord.getSessionTime())).queue();
+                // 사용자의 텍스트 채널에 종료 메시지를 보낸다.
+                if (recordChannel != null) {
+                    recordChannel.sendMessage(user.getAsMention() + "님의 학습이 종료되었습니다.\n" +
+                            "이용한 시간 : " + DurationUtils.format(studyRecord.getSessionTime())).queue();
+                }
             }
+        } catch (RuntimeException e) {
+            recordChannel.sendMessage(e.getMessage()).queue();
         }
     }
 }
