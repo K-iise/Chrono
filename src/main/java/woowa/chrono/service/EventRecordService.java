@@ -23,14 +23,29 @@ public class EventRecordService {
     }
 
     public void participateEvent(String userId, String eventLocation) {
+        validateDuplication(userId, eventLocation);
+
         Member member = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalStateException("등록된 회원이 아닙니다."));
 
         Event event = eventRepository.findByEventLocation(eventLocation)
                 .orElseThrow(() -> new IllegalStateException("등록된 이벤트가 아닙니다."));
 
-        EventRecord eventRecord = EventRecord.builder().member(member).event(event)
+        EventRecord eventRecord = EventRecord.builder()
+                .member(member)
+                .event(event)
                 .participationTime(LocalDateTime.now()).build();
+
         eventRecordRepository.save(eventRecord);
+    }
+
+    private void validateDuplication(String userId, String eventLocation) {
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalStateException("등록된 회원이 아닙니다."));
+        Event event = eventRepository.findByEventLocation(eventLocation)
+                .orElseThrow(() -> new IllegalStateException("등록된 이벤트가 아닙니다."));
+        if (eventRecordRepository.existsByEventAndMember(event, member)) {
+            throw new IllegalStateException("이미 이벤트에 참여했습니다.");
+        }
     }
 }

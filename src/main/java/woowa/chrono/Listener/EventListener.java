@@ -1,6 +1,7 @@
 package woowa.chrono.Listener;
 
 import java.time.LocalDateTime;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventCreateEvent;
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventUserAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -38,9 +39,24 @@ public class EventListener extends ListenerAdapter {
     public void onScheduledEventUserAdd(ScheduledEventUserAddEvent event) {
         String userid = event.getUserId();
         String location = event.getScheduledEvent().getLocation();
+        TextChannel recordChannel = event.getGuild().getTextChannelById("1440644403398967376");
 
-        eventRecordService.participateEvent(userid, location);
-        System.out.println("userid = " + userid);
-        System.out.println("location = " + location);
+        try {
+            // 이벤트 참여를 기록한다.
+            eventRecordService.participateEvent(userid, location);
+            System.out.println("userid = " + userid);
+            System.out.println("location = " + location);
+
+            // 사용자의 텍스트 채널에 이벤트 참여 확인 메시지를 보낸다.
+            if (recordChannel != null) {
+                recordChannel.sendMessage(
+                                event.getUser().getAsMention() + "님 **" + event.getScheduledEvent().getName()
+                                        + "** 이벤트를 참여합니다.")
+                        .queue();
+            }
+        } catch (RuntimeException e) {
+            recordChannel.sendMessage(e.getMessage()).queue();
+        }
+
     }
 }
