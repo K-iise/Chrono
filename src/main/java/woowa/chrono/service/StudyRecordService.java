@@ -15,6 +15,7 @@ import woowa.chrono.domain.Member;
 import woowa.chrono.domain.StudyRecord;
 import woowa.chrono.event.StudyAutoEndedEvent;
 import woowa.chrono.repository.MemberRepository;
+import woowa.chrono.repository.StudyRecordProjection;
 import woowa.chrono.repository.StudyRecordRepository;
 
 @Service
@@ -126,4 +127,44 @@ public class StudyRecordService {
     public boolean endStudyIfActive(String userId) {
         return futureMap.containsKey(userId);
     }
+
+    // 주간 이용 시간 조회
+    public Duration getWeeklyUsageTime(String userId) {
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalStateException("등록된 멤버가 아닙니다."));
+
+        LocalDateTime start = LocalDateTime.now().minusWeeks(1);
+        LocalDateTime end = LocalDateTime.now();
+
+        return getUsageTime(member, start, end);
+    }
+
+    // 월간 이용 시간 조회
+    public Duration getMonthlyUsageTime(String userId) {
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalStateException("등록된 멤버가 아닙니다."));
+
+        LocalDateTime start = LocalDateTime.now().minusMonths(1);
+        LocalDateTime end = LocalDateTime.now();
+
+        return getUsageTime(member, start, end);
+    }
+
+    // 연간 이용 시간 조회
+    public Duration getYearlyUsageTime(String userId) {
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalStateException("등록된 멤버가 아닙니다."));
+
+        LocalDateTime start = LocalDateTime.now().minusYears(1);
+        LocalDateTime end = LocalDateTime.now();
+
+        return getUsageTime(member, start, end);
+    }
+
+    // 특정 회원의 이용 시간 조회
+    private Duration getUsageTime(Member member, LocalDateTime start, LocalDateTime end) {
+        StudyRecordProjection result = studyRecordRepository.findTotalUsageTimeByMember(member, start, end);
+        return result == null ? Duration.ZERO : result.getTotalTime();
+    }
+
 }
