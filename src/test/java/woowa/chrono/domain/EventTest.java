@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import woowa.chrono.domain.event.Event;
+import woowa.chrono.domain.member.Member;
 
 public class EventTest {
     @Test

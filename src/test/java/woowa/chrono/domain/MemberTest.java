@@ -4,11 +4,13 @@ import java.time.Duration;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import woowa.chrono.domain.member.Grade;
+import woowa.chrono.domain.member.Member;
 
 public class MemberTest {
     @Test
     @DisplayName("멤버 빌더 생성 테스트")
-    public void testMemberBuilder_CreatesObjectCorrectly(){
+    public void testMemberBuilder_CreatesObjectCorrectly() {
         Member member = Member.builder()
                 .userId("123")
                 .userName("홍길동")

@@ -1,0 +1,75 @@
+package woowa.chrono.domain.member.handler;
+
+import java.util.List;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import org.springframework.stereotype.Component;
+import woowa.chrono.config.jda.handler.CommandHandler;
+import woowa.chrono.domain.member.Grade;
+import woowa.chrono.domain.member.service.MemberService;
+
+@Component
+public class RoleCommandHandler implements CommandHandler {
+
+    private final MemberService memberService;
+
+    public RoleCommandHandler(MemberService memberService) {
+        this.memberService = memberService;
+    }
+
+    @Override
+    public String getName() {
+        return "role";
+    }
+
+    @Override
+    public String getDescription() {
+        return "사용자의 등급을 변경합니다.";
+    }
+
+    @Override
+    public Grade requiredGrade() {
+        return Grade.ADMIN;
+    }
+
+    @Override
+    public void handle(SlashCommandInteractionEvent event) {
+        String callerId = event.getUser().getId();
+        Grade callerGrade = memberService.findMemberOrThrow(callerId).getGrade();
+
+        if (callerGrade != Grade.ADMIN) {
+            event.reply("이 명령어는 관리자만 사용할 수 있습니다.").setEphemeral(true).queue();
+            return;
+        }
+
+        String userId = event.getOption("user").getAsUser().getId();
+        Role role = event.getOption("role").getAsRole();
+        Grade grade = Grade.fromRoleName(role.getName());
+        memberService.updateMemberGrade(userId, grade);
+
+        List<String> gradeRoles = List.of("뉴비", "멤버", "관리자");
+
+        event.getGuild().retrieveMemberById(userId).queue(member -> {
+            member.getRoles().stream()
+                    .filter(r -> gradeRoles.contains(r.getName()))
+                    .forEach(r -> event.getGuild().removeRoleFromMember(member, r).queue());
+            event.getGuild().addRoleToMember(member, role).queue();
+        });
+        event.reply(event.getOption("user").getAsUser().getAsMention() +
+                "님의 등급이 **" + grade.getDisplayName() + "**(으)로 변경되었습니다.").queue();
+    }
+
+    @Override
+    public List<OptionData> getOptions() {
+        return List.of(new OptionData(OptionType.USER, "user", "등급을 변경할 사용자", true),
+                new OptionData(OptionType.ROLE, "role", "변경할 등급", true));
+    }
+
+    @Override
+    public List<SubcommandData> getSubcommands() {
+        return List.of();
+    }
+}

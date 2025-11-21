@@ -8,9 +8,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import woowa.chrono.domain.Grade;
-import woowa.chrono.domain.Member;
-import woowa.chrono.domain.StudyRecord;
+import woowa.chrono.domain.member.Grade;
+import woowa.chrono.domain.member.Member;
+import woowa.chrono.domain.member.repository.MemberRepository;
+import woowa.chrono.domain.study.StudyRecord;
+import woowa.chrono.domain.study.repository.StudyRecordProjection;
+import woowa.chrono.domain.study.repository.StudyRecordRepository;
 
 @DataJpaTest
 public class StudyRecordRepositoryTest {

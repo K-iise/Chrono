@@ -7,9 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import woowa.chrono.domain.Grade;
-import woowa.chrono.domain.Member;
-import woowa.chrono.repository.MemberRepository;
+import woowa.chrono.domain.member.Grade;
+import woowa.chrono.domain.member.Member;
+import woowa.chrono.domain.member.repository.MemberRepository;
+import woowa.chrono.domain.member.service.MemberService;
 
 @SpringBootTest
 @Transactional

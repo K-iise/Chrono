@@ -10,9 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import woowa.chrono.handler.CommandHandler;
-import woowa.chrono.repository.MemberRepository;
-import woowa.chrono.service.MemberService;
+import woowa.chrono.config.jda.handler.CommandHandler;
+import woowa.chrono.domain.member.listener.MemberListener;
+import woowa.chrono.domain.member.repository.MemberRepository;
+import woowa.chrono.domain.member.service.MemberService;
 
 @ExtendWith(MockitoExtension.class)
 public class MemberListenerTest {

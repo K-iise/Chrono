@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import woowa.chrono.domain.member.Member;
+import woowa.chrono.domain.study.StudyRecord;
 
 public class StudyRecordTest {
     @Test

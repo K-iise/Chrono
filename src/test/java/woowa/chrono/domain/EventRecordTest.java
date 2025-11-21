@@ -4,11 +4,14 @@ import java.time.LocalDateTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import woowa.chrono.domain.event.Event;
+import woowa.chrono.domain.event.EventRecord;
+import woowa.chrono.domain.member.Member;
 
 public class EventRecordTest {
     @Test
     @DisplayName("이벤트 기록 빌더 생성 테스트")
-    public void testEventRecordBuilder_CreatesObjectCorrectly(){
+    public void testEventRecordBuilder_CreatesObjectCorrectly() {
 
         Event event = Event.builder().build();
         Member member = Member.builder().build();

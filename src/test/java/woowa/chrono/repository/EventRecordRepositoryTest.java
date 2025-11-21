@@ -7,9 +7,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import woowa.chrono.domain.Event;
-import woowa.chrono.domain.EventRecord;
-import woowa.chrono.domain.Member;
+import woowa.chrono.domain.event.Event;
+import woowa.chrono.domain.event.EventRecord;
+import woowa.chrono.domain.event.repository.EventRecordRepository;
+import woowa.chrono.domain.event.repository.EventRepository;
+import woowa.chrono.domain.member.Member;
+import woowa.chrono.domain.member.repository.MemberRepository;
 
 @DataJpaTest
 public class EventRecordRepositoryTest {
