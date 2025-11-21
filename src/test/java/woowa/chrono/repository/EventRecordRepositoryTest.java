@@ -32,9 +32,10 @@ public class EventRecordRepositoryTest {
                 .userName("홍길동")
                 .build();
         Event event = Event.builder()
-                .eventId("12")
                 .content("테스트 이벤트")
                 .admin(member)
+                .title("test")
+                .eventLocation("test")
                 .startTime(LocalDateTime.MIN)
                 .endTime(LocalDateTime.MAX)
                 .build();

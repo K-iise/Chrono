@@ -10,14 +10,13 @@ public class EventTest {
     @DisplayName("이벤트 빌더 생성 테스트")
     public void testEventBuilder_CreatesObjectCorrectly() {
         Event event = Event.builder()
-                .eventId("12")
                 .content("이벤트 개설")
+                .eventLocation("test")
                 .admin(Member.builder().build())
                 .startTime(LocalDateTime.MIN)
                 .endTime(LocalDateTime.MAX)
                 .build();
 
-        Assertions.assertThat(event.getEventId()).isEqualTo("12");
         Assertions.assertThat(event.getContent()).isEqualTo("이벤트 개설");
         Assertions.assertThat(event.getStartTime()).isEqualTo(LocalDateTime.MIN);
         Assertions.assertThat(event.getEndTime()).isEqualTo(LocalDateTime.MAX);

@@ -11,10 +11,7 @@ import woowa.chrono.repository.MemberRepository;
 @Service
 @Transactional
 public class MemberService {
-
-    // 포인트로 구매 가능한 시간 단위 (1시간 = 1000포인트)
     private static final int POINT_PER_HOUR = 1000;
-
     private final MemberRepository memberRepository;
 
     public MemberService(MemberRepository memberRepository) {
@@ -89,7 +86,7 @@ public class MemberService {
         if (member.getPoint() < point) {
             throw new IllegalArgumentException("[ERROR] 보유 포인트(" + member.getPoint() + ")가 부족합니다. 요청: " + point);
         }
-        
+
         member.usePoint(point);
         int requiredTimes = point / POINT_PER_HOUR;
         member.addUsageTime(Duration.ofHours(requiredTimes));

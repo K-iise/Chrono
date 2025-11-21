@@ -22,6 +22,12 @@ public class EventRecordService {
         this.memberRepository = memberRepository;
     }
 
+    /**
+     * 특정 유저 ID와 이벤트 위치를 통해서 이벤트 참여를 기록합니다.
+     *
+     * @param userId
+     * @param eventLocation
+     */
     public void participateEvent(String userId, String eventLocation) {
         validateDuplication(userId, eventLocation);
 
@@ -39,6 +45,12 @@ public class EventRecordService {
         eventRecordRepository.save(eventRecord);
     }
 
+    /**
+     * 특정 회원의 이벤트 참여 여부를 확인합니다.
+     *
+     * @param userId
+     * @param eventLocation
+     */
     private void validateDuplication(String userId, String eventLocation) {
         Member member = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalStateException("등록된 회원이 아닙니다."));

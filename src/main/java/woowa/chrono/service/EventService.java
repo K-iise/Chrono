@@ -17,7 +17,16 @@ public class EventService {
         this.memberRepository = memberRepository;
     }
 
-    // 등록한 이벤트를 DB에 저장하는 기능
+    /**
+     * 지정된 관리자(adminId)가 새로운 이벤트를 등록합니다.
+     *
+     * @param adminId
+     * @param title
+     * @param content
+     * @param location
+     * @param startTime
+     * @param endTime
+     */
     public void registerEvent(String adminId, String title, String content, String location, LocalDateTime startTime,
                               LocalDateTime endTime) {
         Member admin = memberRepository.findByUserId(adminId)
