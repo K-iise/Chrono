@@ -2,8 +2,10 @@ package woowa.chrono.Listener;
 
 import java.time.LocalDateTime;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventCreateEvent;
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventUserAddEvent;
+import net.dv8tion.jda.api.events.thread.member.ThreadMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.springframework.stereotype.Component;
 import woowa.chrono.service.EventRecordService;
@@ -57,6 +59,31 @@ public class EventListener extends ListenerAdapter {
         } catch (RuntimeException e) {
             recordChannel.sendMessage(e.getMessage()).queue();
         }
+    }
 
+    // 이벤트 포럼에 팔로우한 경우(이벤트에 참가하기 위한 이벤트)
+    @Override
+    public void onThreadMemberJoin(ThreadMemberJoinEvent event) {
+        String userid = event.getMember().getId();
+        ThreadChannel threadChannel = event.getThread();
+        String location = threadChannel.getJumpUrl();
+
+        TextChannel recordChannel = event.getGuild().getTextChannelById("1440644403398967376");
+
+        try {
+            // 이벤트 참여를 기록한다.
+            eventRecordService.participateEvent(userid, location);
+            System.out.println("userid = " + userid);
+            System.out.println("location = " + location);
+
+            // 사용자의 텍스트 채널에 이벤트 참여 확인 메시지를 보낸다.
+            if (recordChannel != null) {
+                recordChannel.sendMessage(
+                        event.getMember().getAsMention() + "님 **" + threadChannel.getName()
+                                + "** 이벤트를 참여합니다.").queue();
+            }
+        } catch (RuntimeException e) {
+            recordChannel.sendMessage(e.getMessage()).queue();
+        }
     }
 }

@@ -44,6 +44,9 @@ public class Member {
     @Builder.Default
     @Column(name = "point")
     int point = 0;
+    
+    @Column(name = "channel_id")
+    private String channelId;
 
     public void changeGrade(Grade newGrade) {
         this.grade = newGrade;
@@ -66,7 +69,7 @@ public class Member {
     public void addUsageTime(Duration time) {
         this.usageTime = this.usageTime.plus(time);
     }
-    
+
     public void useUsageTime(Duration usageTime) {
         this.usageTime = this.usageTime.minus(usageTime);
     }

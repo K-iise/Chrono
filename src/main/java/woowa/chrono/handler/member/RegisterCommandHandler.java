@@ -1,6 +1,8 @@
 package woowa.chrono.handler.member;
 
 import java.util.List;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -45,13 +47,30 @@ public class RegisterCommandHandler implements CommandHandler {
                 event.reply("이 명령어는 관리자만 사용할 수 있습니다.").setEphemeral(true).queue();
                 return;
             }
-            
+
             String memberId = event.getOption("user").getAsUser().getId();
             String memberName = event.getOption("user").getAsUser().getName();
 
+            // 특정 회원 ID와 부여할 권한을 미리 설정합니다.
+            long targetUserId = event.getOption("user").getAsUser().getIdLong();
+
+            // 특정 회원에게 허용할 권한: 채널 보기(VIEW_CHANNEL) 및 메시지 전송(MESSAGE_SEND)
+            long allowForMember = Permission.VIEW_CHANNEL.getRawValue() | Permission.MESSAGE_SEND.getRawValue();
+
+            // 개인 텍스트 채널 생성
+            TextChannel personalChannel = event.getGuild()
+                    .createTextChannel(memberName)
+                    .addPermissionOverride(event.getGuild().getPublicRole(), 0L,
+                            allowForMember)
+                    .addMemberPermissionOverride(targetUserId,
+                            allowForMember, 0L)
+                    .complete();
+
+            // 생성한 채널 ID 저장
             Member member = Member.builder()
                     .userId(memberId)
                     .userName(memberName)
+                    .channelId(personalChannel.getId())
                     .build();
 
             memberService.registerMember(member);
@@ -59,7 +78,7 @@ public class RegisterCommandHandler implements CommandHandler {
             event.reply("등록 완료!").queue();
 
         } catch (IllegalStateException e) {
-            event.reply("❌ " + e.getMessage()).setEphemeral(true).queue();
+            event.reply(e.getMessage()).setEphemeral(true).queue();
         }
     }
 
