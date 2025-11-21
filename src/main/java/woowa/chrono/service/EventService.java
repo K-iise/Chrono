@@ -1,11 +1,13 @@
 package woowa.chrono.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import woowa.chrono.domain.Event;
 import woowa.chrono.domain.Member;
 import woowa.chrono.repository.EventRepository;
 import woowa.chrono.repository.MemberRepository;
+import woowa.chrono.repository.StudyRecordProjection;
 
 @Service
 public class EventService {
@@ -37,5 +39,12 @@ public class EventService {
                 .build();
 
         eventRepository.save(event);
+    }
+
+    public List<StudyRecordProjection> summaryStudyEvent(String location, LocalDateTime startTime,
+                                                         LocalDateTime endTime) {
+        Event event = eventRepository.findByEventLocation(location)
+                .orElseThrow(() -> new IllegalStateException("등록된 이벤트가 아닙니다."));
+        return eventRepository.findStudySummaryByEvent(event.getId(), startTime, endTime);
     }
 }
