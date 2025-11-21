@@ -41,10 +41,9 @@ public class EventService {
         eventRepository.save(event);
     }
 
-    public List<StudyRecordProjection> summaryStudyEvent(String location, LocalDateTime startTime,
-                                                         LocalDateTime endTime) {
+    public List<StudyRecordProjection> summaryStudyEvent(String location) {
         Event event = eventRepository.findByEventLocation(location)
                 .orElseThrow(() -> new IllegalStateException("등록된 이벤트가 아닙니다."));
-        return eventRepository.findStudySummaryByEvent(event.getId(), startTime, endTime);
+        return eventRepository.findStudySummaryByEvent(event.getId(), event.getStartTime(), event.getEndTime());
     }
 }
