@@ -1,5 +1,7 @@
 package woowa.chrono.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.Duration;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.domain.member.Grade;
 import woowa.chrono.domain.member.Member;
+import woowa.chrono.domain.member.dto.request.MemberRegisterRequest;
+import woowa.chrono.domain.member.dto.response.MemberRegisterResponse;
 import woowa.chrono.domain.member.repository.MemberRepository;
 import woowa.chrono.domain.member.service.MemberService;
 
@@ -26,13 +30,18 @@ public class MemberServiceTest {
     @DisplayName("멤버 등록 저장소에 저장된다.")
     public void registrationMemberTest() {
         // given
-        Member member = Member.builder().userId("1234").userName("홍길동").build();
+        MemberRegisterRequest request = MemberRegisterRequest.builder().userId("1234").userName("홍길동").channelId("123")
+                .build();
 
         // when
-        Member saved = memberService.registerMember(member);
+        MemberRegisterResponse response = memberService.registerMember(request);
 
         // then
-        Assertions.assertThat(memberRepository.findById(saved.getId())).isPresent();
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getUserId()).isEqualTo("1234");
+        assertThat(response.getUserName()).isEqualTo("홍길동");
+        assertThat(response.getChannelId()).isEqualTo("123");
     }
 
     @Test
@@ -48,7 +57,7 @@ public class MemberServiceTest {
         Member found = memberService.updateMemberGrade(admin.getUserId(), member.getUserId(), Grade.REGULAR);
 
         // then
-        Assertions.assertThat(found.getGrade()).isEqualTo(Grade.REGULAR);
+        assertThat(found.getGrade()).isEqualTo(Grade.REGULAR);
     }
 
     @Test
@@ -62,7 +71,7 @@ public class MemberServiceTest {
         Duration found = memberService.getUsageTime(member.getUserId());
 
         // then
-        Assertions.assertThat(found).isEqualTo(Duration.ZERO);
+        assertThat(found).isEqualTo(Duration.ZERO);
     }
 
     @Test
@@ -76,7 +85,7 @@ public class MemberServiceTest {
         int found = memberService.getPoint(member.getUserId());
 
         // then
-        Assertions.assertThat(found).isEqualTo(1000);
+        assertThat(found).isEqualTo(1000);
     }
 
     @Test
@@ -102,7 +111,7 @@ public class MemberServiceTest {
         Member updated = memberService.increaseUsageTime(admin.getUserId(), member.getUserId(), addTime);
 
         // then
-        Assertions.assertThat(updated.getUsageTime())
+        assertThat(updated.getUsageTime())
                 .isEqualTo(Duration.ofMinutes(addTime));
     }
 
@@ -165,7 +174,7 @@ public class MemberServiceTest {
         Member updated = memberService.updateUsageTime(admin.getUserId(), member.getUserId(), updateTime);
 
         // then
-        Assertions.assertThat(updated.getUsageTime().toMinutes()).isEqualTo(100);
+        assertThat(updated.getUsageTime().toMinutes()).isEqualTo(100);
     }
 
     @Test
@@ -214,7 +223,7 @@ public class MemberServiceTest {
         Member test = memberService.increasePoint(admin.getUserId(), regular.getUserId(), addpoint);
 
         // then
-        Assertions.assertThat(test.getPoint()).isEqualTo(addpoint);
+        assertThat(test.getPoint()).isEqualTo(addpoint);
     }
 
     @Test
@@ -262,7 +271,7 @@ public class MemberServiceTest {
         Member updatedMember = memberService.updatePoint(admin.getUserId(), member.getUserId(), point);
 
         // then
-        Assertions.assertThat(updatedMember.getPoint()).isEqualTo(point);
+        assertThat(updatedMember.getPoint()).isEqualTo(point);
     }
 
     @Test

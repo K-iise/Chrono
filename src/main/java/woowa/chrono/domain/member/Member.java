@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.common.exception.ErrorCode;
+import woowa.chrono.domain.member.dto.request.MemberRegisterRequest;
 
 @Getter
 @NoArgsConstructor
@@ -110,6 +111,14 @@ public class Member {
         if (this.usageTime.minus(time).isNegative()) {
             throw new ChronoException(ErrorCode.LACK_TIME);
         }
+    }
+
+    public static Member from(MemberRegisterRequest request) {
+        return Member.builder()
+                .userId(request.getUserId())
+                .userName(request.getUserName())
+                .channelId(request.getChannelId())
+                .build();
     }
 
 }

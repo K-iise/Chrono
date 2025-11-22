@@ -8,6 +8,8 @@ import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.common.exception.ErrorCode;
 import woowa.chrono.domain.member.Grade;
 import woowa.chrono.domain.member.Member;
+import woowa.chrono.domain.member.dto.request.MemberRegisterRequest;
+import woowa.chrono.domain.member.dto.response.MemberRegisterResponse;
 import woowa.chrono.domain.member.repository.MemberRepository;
 
 @Service
@@ -24,9 +26,11 @@ public class MemberService {
     }
 
     // 회원 등록
-    public Member registerMember(Member member) {
+    public MemberRegisterResponse registerMember(MemberRegisterRequest request) {
+        Member member = Member.from(request);
         validateDuplication(member);
-        return memberRepository.save(member);
+        memberRepository.save(member);
+        return MemberRegisterResponse.from(member);
     }
 
     // 회원 등급 변경

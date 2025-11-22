@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.stereotype.Component;
 import woowa.chrono.config.jda.handler.CommandHandler;
 import woowa.chrono.domain.member.Grade;
-import woowa.chrono.domain.member.Member;
+import woowa.chrono.domain.member.dto.request.MemberRegisterRequest;
 import woowa.chrono.domain.member.service.MemberService;
 
 @Component
@@ -66,14 +66,11 @@ public class RegisterCommandHandler implements CommandHandler {
                             allowForMember, 0L)
                     .complete();
 
-            // 생성한 채널 ID 저장
-            Member member = Member.builder()
-                    .userId(memberId)
-                    .userName(memberName)
+            MemberRegisterRequest request = MemberRegisterRequest.builder().userId(memberId).userName(memberName)
                     .channelId(personalChannel.getId())
                     .build();
 
-            memberService.registerMember(member);
+            memberService.registerMember(request);
 
             event.reply("등록 완료!").queue();
 
