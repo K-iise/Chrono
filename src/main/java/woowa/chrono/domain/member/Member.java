@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import woowa.chrono.common.exception.ChronoException;
+import woowa.chrono.common.exception.ErrorCode;
 
 @Getter
 @NoArgsConstructor
@@ -52,34 +54,62 @@ public class Member {
         this.grade = newGrade;
     }
 
-    public void addPoint(int amount) {
-        if (amount < 0) {
-            throw new IllegalArgumentException("포인트는 음수로 추가할 수 없습니다.");
-        }
-        this.point += amount;
+    public void addPoint(int point) {
+        validatePositivePoint(point);
+        this.point += point;
     }
 
-    public void usePoint(int amount) {
-        if (this.point < amount) {
-            throw new IllegalStateException("포인트가 부족합니다.");
-        }
-        this.point -= amount;
+    public void usePoint(int point) {
+        validatePositivePoint(point);
+        validateEnoughPoint(point);
+        this.point -= point;
     }
 
-    public void addUsageTime(Duration time) {
-        this.usageTime = this.usageTime.plus(time);
+
+    public void addUsageTime(Duration usageTime) {
+        validatePositiveTime(usageTime);
+        this.usageTime = this.usageTime.plus(usageTime);
     }
 
     public void useUsageTime(Duration usageTime) {
+        validatePositiveTime(usageTime);
+        validateEnoughTime(usageTime);
         this.usageTime = this.usageTime.minus(usageTime);
     }
 
-    public void updateUsageTime(Duration time) {
-        this.usageTime = time;
+    public void updateUsageTime(Duration usageTime) {
+        validatePositiveTime(usageTime);
+        this.usageTime = usageTime;
     }
 
+
     public void updatePoint(int point) {
+        validatePositivePoint(point);
         this.point = point;
+    }
+
+    private void validatePositivePoint(int point) {
+        if (point < 0) {
+            throw new ChronoException(ErrorCode.INVALID_POINT);
+        }
+    }
+
+    private void validateEnoughPoint(int point) {
+        if (this.point < point) {
+            throw new ChronoException(ErrorCode.LACK_POINT);
+        }
+    }
+
+    private void validatePositiveTime(Duration time) {
+        if (time.isNegative()) {
+            throw new ChronoException(ErrorCode.INVALID_TIME);
+        }
+    }
+
+    private void validateEnoughTime(Duration time) {
+        if (this.usageTime.minus(time).isNegative()) {
+            throw new ChronoException(ErrorCode.LACK_TIME);
+        }
     }
 
 }

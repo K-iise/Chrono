@@ -18,7 +18,7 @@ public class DurationUtils {
         if (minutes > 0) {
             sb.append(minutes).append("분 ");
         }
-        if (secs > 0 || sb.length() == 0) {
+        if (secs > 0 || sb.isEmpty()) {
             sb.append(secs).append("초");
         }
 
