@@ -1,69 +1,30 @@
-## 🕒 Chrono
-### 프로젝트 목표 설정
+<center><img src="image/chronobot_rogo.png" alt="ChronoBots" width="80%" /></center>
 
-## 1. 프로젝트 개요
+# 🕒 우아한테크코스 오픈 미션
+![Precourse Week 4](https://img.shields.io/badge/precourse-week4-green.svg)
+![Version](https://img.shields.io/badge/version-1.0.1-brightgreen.svg)
+![Duration](https://img.shields.io/badge/duration-3_weeks-blue)
+![Language](https://img.shields.io/badge/language-Java-orange?logo=java&logoColor=white)
+![Framework](https://img.shields.io/badge/framework-Spring_Boot-green?logo=spring&logoColor=white)
 
-- **프로젝트명:** 디스코드 타이머 봇 제작
-- **목적:**  
-  디스코드 API를 활용하여 공부 시간을 자동으로 기록해주는 타이머 봇을 개발하고, 실제 서버에 배포하여 실사용 환경에서 테스트  
-  수동 기록의 번거로움을 해소하고, 개인 및 팀의 학습 시간을 효율적으로 관리
+> **ChronoBot**은 **Discord API(JDA)** 기반으로 구축된 **온라인 스터디 카페 시스템 지원 봇**입니다.<br>
+> 포인트로 이용시간을 충전해 개인 공부방에서 공부 시간을 자동 기록할 수 있으며,<br>
+> 이벤트 기간 동안의 누적 이용시간을 기준으로 랭킹·보상 시스템까지 제공하는 통합 학습 관리 플랫폼입니다.
 
-- **배경:**  
-  디스코드 내 공부 기록 채널에서 매번 수동으로 공부 시작/종료 시간을 기록하는 불편함을 느껴,  
-  Discord API 학습 및 자동 기록 기능 구현을 위해 프로젝트를 진행
-
+## 🛠 기술 스택
+![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat&logo=java&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/SpringBoot-6DB33F?style=flat&logo=spring&logoColor=white)
+![JPA](https://img.shields.io/badge/JPA-Hibernate-59666C?style=flat&logo=hibernate&logoColor=white)
+![JDA](https://img.shields.io/badge/JDA-7289DA?style=flat&logo=discord&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-FF9900?style=flat&logo=amazonaws&logoColor=white)
 ---
 
-## 2. 핵심 목표
+## 📌 목차
+* [프로젝트 개요](#프로젝트 개요)
+* [주요 기능 목록](#주요 기능 목록)
 
-- **주요 목표:**  
-  사용자의 명령어 입력에 따라 공부 시작/종료 시간을 자동으로 기록하고, 누적 공부 시간을 확인할 수 있는 타이머 봇 개발
-
-- **세부 목표:**
-    1. Discord API를 활용하여 명령어 처리
-    2. 사용자별 공부 시간을 서버 DB에 저장하고, 누적/통계 정보 제공
-    3. 관리자가 멤버별 타이머 사용 권한 부여 및 회수
-    4. 봇이 정상적으로 서버 상주하며 실시간 명령 처리 및 로그 기록
-    5. Spring Framework 기반으로 SOLID 원칙에 맞춘 객체 지향 구조 구현
-
----
-
-## 3. 기술 스택 및 개발 환경
-
-- **언어 및 프레임워크:** Java, Spring Framework
-- **API:** Discord API (JDA 라이브러리 사용)
-- **데이터베이스:** MySQL 또는 H2
-- **배포 환경:** AWS EC2 / Docker
-- **개발 원칙:** SOLID 원칙 준수, 계층형 아키텍처 적용 (Controller-Service-Repository 구조)
-
----
-
-## 4. 프로젝트 범위
-
-- **포함 사항:**
-    - Discord 명령어 처리 기능
-    - 공부 시간 시작/종료 기록
-    - 사용자별 누적 시간 통계 제공
-    - 관리자 권한 부여 및 회수 기능
-    - 서버 로그 및 예외 처리 로직
-
-- **제외 사항:**
-    - 음성 기반 명령 처리
-    - 외부 캘린더 연동(Google Calendar 등)
-    - 디스코드 인터페이스(UI) 커스터마이징
-
----
-
-## 5. 성공 지표
-
-- Discord 서버 내 명령어 3종(`!record`, `!points`, `!times`) 정상 작동
-- 서버 재시작 후에도 사용자 데이터 유지
-- 평균 응답 시간 1초 이하
-- 1주일간 누적 데이터 100회 이상 기록 가능
-
----
-
-## 기능 요구사항
+# ⚙️ 주요 기능 목록
 
 ### 1. 사용자 구분
 
