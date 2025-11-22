@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.domain.member.Grade;
 import woowa.chrono.domain.member.Member;
 import woowa.chrono.domain.member.repository.MemberRepository;
@@ -38,11 +39,13 @@ public class MemberServiceTest {
     @DisplayName("사용자의 등급을 변경합니다.")
     public void updateMemberGradeTest() {
         // given
+        Member admin = Member.builder().userId("1234").grade(Grade.ADMIN).build();
         Member member = Member.builder().userId("123").userName("홍길동").build();
         memberRepository.save(member);
+        memberRepository.save(admin);
 
         // when
-        Member found = memberService.updateMemberGrade("123", Grade.REGULAR);
+        Member found = memberService.updateMemberGrade(admin.getUserId(), member.getUserId(), Grade.REGULAR);
 
         // then
         Assertions.assertThat(found.getGrade()).isEqualTo(Grade.REGULAR);
@@ -125,7 +128,7 @@ public class MemberServiceTest {
         // when & then
         Assertions.assertThatThrownBy(() ->
                 memberService.increaseUsageTime(regular.getUserId(), member.getUserId(), 100)
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ChronoException.class);
     }
 
 
@@ -143,7 +146,7 @@ public class MemberServiceTest {
         // when & then
         Assertions.assertThatThrownBy(() ->
                 memberService.increaseUsageTime(admin.getUserId(), "no-user", 100)
-        ).isInstanceOf(IllegalArgumentException.class);
+        ).isInstanceOf(ChronoException.class);
     }
 
     @Test
@@ -180,7 +183,7 @@ public class MemberServiceTest {
         int updateTime = 100;
         Assertions.assertThatThrownBy(
                         () -> memberService.updateUsageTime(regular.getUserId(), member.getUserId(), updateTime))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(ChronoException.class);
     }
 
     @Test
@@ -193,7 +196,7 @@ public class MemberServiceTest {
         // when & then
         Assertions.assertThatThrownBy(
                         () -> memberService.updateUsageTime(admin.getUserId(), "test1", updateTime))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(ChronoException.class);
     }
 
     @Test
@@ -228,7 +231,7 @@ public class MemberServiceTest {
         int addpoint = 100;
         Assertions.assertThatThrownBy(() ->
                         memberService.increasePoint(notAdmin.getUserId(), regular.getUserId(), addpoint))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(ChronoException.class);
     }
 
     @Test
@@ -241,7 +244,7 @@ public class MemberServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> memberService.increasePoint(admin.getUserId(), "test", addpoint))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(ChronoException.class);
     }
 
     @Test
@@ -275,7 +278,7 @@ public class MemberServiceTest {
         // when & then
         int point = 100;
         Assertions.assertThatThrownBy(() -> memberService.updatePoint(regular.getUserId(), member.getUserId(), point))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(ChronoException.class);
     }
 
     @Test
@@ -287,7 +290,7 @@ public class MemberServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> memberService.updatePoint(admin.getUserId(), "test", point))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(ChronoException.class);
     }
 }
 

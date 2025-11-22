@@ -41,7 +41,7 @@ public class RegisterCommandHandler implements CommandHandler {
     public void handle(SlashCommandInteractionEvent event) {
         try {
             String callerId = event.getUser().getId();
-            Grade callerGrade = memberService.findMemberOrThrow(callerId).getGrade();
+            Grade callerGrade = memberService.findMember(callerId, true).getGrade();
 
             if (callerGrade != Grade.ADMIN) {
                 event.reply("이 명령어는 관리자만 사용할 수 있습니다.").setEphemeral(true).queue();

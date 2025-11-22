@@ -1,8 +1,10 @@
 package woowa.chrono.domain.member.service;
 
 import java.time.Duration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.common.exception.ErrorCode;
 import woowa.chrono.domain.member.Grade;
 import woowa.chrono.domain.member.Member;
@@ -11,119 +13,104 @@ import woowa.chrono.domain.member.repository.MemberRepository;
 @Service
 @Transactional
 public class MemberService {
-    private static final int POINT_PER_HOUR = 1000;
+
+    @Value("${chrono.point-per-hour}")
+    private int POINT_PER_HOUR;
+
     private final MemberRepository memberRepository;
 
     public MemberService(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
 
+    // 회원 등록
     public Member registerMember(Member member) {
         validateDuplication(member);
         return memberRepository.save(member);
     }
 
-    public Member updateMemberGrade(String userId, Grade grade) {
-        Member found = findMemberOrThrow(userId);
-        found.changeGrade(grade);
-        return found;
+    // 회원 등급 변경
+    public Member updateMemberGrade(String adminId, String userId, Grade grade) {
+        Member member = findAdminAndMember(adminId, userId);
+        member.changeGrade(grade);
+        return member;
     }
 
+    // 회원 사용 시간 조회
     public Duration getUsageTime(String userId) {
-        Member found = findMemberOrThrow(userId);
+        Member found = findMember(userId, false);
         return found.getUsageTime();
     }
 
+    // 회원 포인트 조회
     public int getPoint(String userId) {
-        Member found = findMemberOrThrow(userId);
+        Member found = findMember(userId, false);
         return found.getPoint();
     }
 
+    // 회원 이용 시간 추가 (관리자 권한 필수)
     public Member increaseUsageTime(String adminId, String userId, int time) {
-        validatePositiveTime(time);
-        requireAdmin(adminId);
-        Member member = findMemberOrThrow(userId);
-
+        Member member = findAdminAndMember(adminId, userId);
         member.addUsageTime(Duration.ofMinutes(time));
         return member;
     }
 
+    // 회원 이용 시간 수정 (관리자 권한 필수)
     public Member updateUsageTime(String adminId, String userId, int time) {
-        validatePositiveTime(time);
-        requireAdmin(adminId);
-        Member member = findMemberOrThrow(userId);
-
+        Member member = findAdminAndMember(adminId, userId);
         member.updateUsageTime(Duration.ofMinutes(time));
         return member;
-
     }
 
+    // 회원 포인트 추가 (관리자 권한 필수)
     public Member increasePoint(String adminId, String userId, int point) {
-        validatePositivePoint(point);
-        requireAdmin(adminId);
-        Member member = findMemberOrThrow(userId);
-
+        Member member = findAdminAndMember(adminId, userId);
         member.addPoint(point);
         return member;
     }
 
-
+    // 회원 포인트 수정 (관리자 권한 필수)
     public Member updatePoint(String adminId, String userId, int point) {
-        validatePositivePoint(point);
-        requireAdmin(adminId);
-        Member member = findMemberOrThrow(userId);
-
+        Member member = findAdminAndMember(adminId, userId);
         member.updatePoint(point);
         return member;
     }
 
+    // 이용 시간 구매
     public Member purchaseUsageTime(String userId, int point) {
+        Member member = findMember(userId, false);
         if (point % POINT_PER_HOUR != 0) {
-            throw new IllegalArgumentException("[ERROR] 포인트의 구매 단위는 " + POINT_PER_HOUR + "입니다.");
+            throw new ChronoException(ErrorCode.PURCHASE_UNIT);
         }
-
-        Member member = findMemberOrThrow(userId);
         if (member.getPoint() < point) {
-            throw new IllegalArgumentException("[ERROR] 보유 포인트(" + member.getPoint() + ")가 부족합니다. 요청: " + point);
+            throw new ChronoException(ErrorCode.HAVE_POINT);
         }
-
         member.usePoint(point);
-        int requiredTimes = point / POINT_PER_HOUR;
-        member.addUsageTime(Duration.ofHours(requiredTimes));
+        member.addUsageTime(Duration.ofHours(point / POINT_PER_HOUR));
 
         return member;
     }
 
-    private void validatePositiveTime(int time) {
-        if (time <= 0) {
-            throw new IllegalArgumentException(ErrorCode.INVALID_TIME.getMessage());
+    // 회원 조회 (관리자 검증 옵션)
+    public Member findMember(String userId, boolean mustBeAdmin) {
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new ChronoException(ErrorCode.MEMBER_NOT_FOUND));
+        if (mustBeAdmin && member.getGrade() != Grade.ADMIN) {
+            throw new ChronoException(ErrorCode.NOT_ADMIN);
         }
+        return member;
     }
 
-    private void validatePositivePoint(int point) {
-        if (point < 0) {
-            throw new IllegalArgumentException(ErrorCode.INVALID_POINT.getMessage());
-        }
+    // 회원 및 관리자 조회
+    private Member findAdminAndMember(String adminId, String userId) {
+        findMember(adminId, true); // 관리자 검증
+        return findMember(userId, false);
     }
 
+    // 회원 중복 검증
     private void validateDuplication(Member member) {
         if (memberRepository.findByUserId(member.getUserId()).isPresent()) {
-            throw new IllegalStateException(ErrorCode.DUPLICATE_MEMBER.getMessage());
-        }
-    }
-
-    public Member findMemberOrThrow(String userId) {
-        return memberRepository.findByUserId(userId).orElseThrow(
-                () -> new IllegalArgumentException(ErrorCode.MEMBER_NOT_FOUND.getMessage())
-        );
-    }
-
-    public void requireAdmin(String adminId) {
-        Member admin = memberRepository.findByUserId(adminId).orElseThrow(
-                () -> new IllegalArgumentException(ErrorCode.ADMIN_NOT_FOUND.getMessage())
-        );
-        if (admin.getGrade() != Grade.ADMIN) {
-            throw new IllegalStateException(ErrorCode.NOT_ADMIN.getMessage());
+            throw new ChronoException(ErrorCode.DUPLICATE_MEMBER);
         }
     }
 

@@ -8,7 +8,9 @@ public enum ErrorCode {
     INVALID_TIME("[Error] 입력된 시간 값은 0보다 커야 합니다."),
     INVALID_POINT("[Error] 입력된 포인트는 0보다 커야 합니다."),
     LACK_POINT("[Error] 포인트가 부족합니다."),
-    LACK_TIME("[Error] 이용 시간이 부족합니다.");
+    LACK_TIME("[Error] 이용 시간이 부족합니다."),
+    PURCHASE_UNIT("[ERROR] 포인트의 구매 단위는 1000P 입니다."),
+    HAVE_POINT("[ERROR] 보유한 포인트가 부족합니다.");
 
     private final String message;
 

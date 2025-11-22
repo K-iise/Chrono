@@ -53,7 +53,7 @@ public class PointsCommandHandler implements CommandHandler {
 
     private void handleUserCommand(SlashCommandInteractionEvent event, String subCommand) {
         String userId = event.getUser().getId();
-        Member member = memberService.findMemberOrThrow(userId);
+        Member member = memberService.findMember(userId, false);
         String mention = event.getUser().getAsMention();
 
         switch (subCommand) {
@@ -71,10 +71,10 @@ public class PointsCommandHandler implements CommandHandler {
 
     private void handleAdminCommand(SlashCommandInteractionEvent event, String subCommand) {
         // 관리자 권한 체크
-        memberService.requireAdmin(event.getUser().getId());
+        Member admin = memberService.findMember(event.getUser().getId(), true);
 
         String targetUserId = event.getOption("user").getAsUser().getId();
-        Member target = memberService.findMemberOrThrow(targetUserId);
+        Member target = memberService.findMember(targetUserId, false);
         String mention = event.getOption("user").getAsUser().getAsMention();
 
         switch (subCommand) {

@@ -10,4 +10,5 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
-      # ddl-auto - @Entity 테이블 정보를 실제 DB에 반영 할건지 설정(create/update/none..)
+chrono:
+  point-per-hour: 1000
