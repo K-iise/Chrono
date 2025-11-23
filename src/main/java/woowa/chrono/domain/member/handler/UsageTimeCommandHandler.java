@@ -66,8 +66,6 @@ public class UsageTimeCommandHandler implements CommandHandler {
         try {
             switch (subCommand) {
                 case "get" -> {
-                    event.deferReply(true).queue();
-
                     GetUsageTimeRequest request = GetUsageTimeRequest.builder().userId(userId).build();
                     GetUsageTimeResponse response = memberService.getUsageTime(request);
 
