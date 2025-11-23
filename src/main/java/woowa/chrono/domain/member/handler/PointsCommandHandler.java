@@ -79,9 +79,10 @@ public class PointsCommandHandler implements CommandHandler {
                     ModifyUsageTimeRequest request = ModifyUsageTimeRequest.builder().userId(userId).usageTime(amount)
                             .build();
                     ModifyUsageTimeResponse response = memberService.purchaseUsageTime(request);
-                    event.getHook().sendMessage(
-                                    mention + "님의 현재 남은 이용 시간은 **" + DurationUtils.format(response.getUsageTime()) + "**입니다.\n")
-                            .queue();
+                    String message = mention +
+                            "님의 이용 시간이 **추가되었습니다!**\n" +
+                            "현재 남은 이용 시간은 **" + DurationUtils.format(response.getUsageTime()) + "**입니다.";
+                    event.getHook().sendMessage(message).queue();
                 }
 
                 default -> event.getHook().sendMessage("알 수 없는 명령어입니다.").queue();
@@ -129,7 +130,7 @@ public class PointsCommandHandler implements CommandHandler {
                 new SubcommandGroupData("user", "일반 사용자용 포인트 명령어")
                         .addSubcommands(
                                 new SubcommandData("get", "현재 보유하고 있는 포인트 잔액을 확인합니다."),
-                                new SubcommandData("use", "포인트 사용")
+                                new SubcommandData("use", "현재 보유하고 있는 포인트를 통해 이용 시간을 구매합니다.")
                                         .addOptions(new OptionData(OptionType.INTEGER, "amount",
                                                 "포인트 구매 단위는 1000P당 1시간 이용 시간이 충전됩니다.", true))
                         ),

@@ -120,11 +120,7 @@
 
 ### 👤 일반 사용자 기능 (General User Features)
 
-<details>
-<summary><strong>포인트 및 이용시간 관리 (/points & /time)</strong></summary>
-
-<details>
-<summary><strong>포인트 조회 (/points user get)</strong></summary>
+<details><summary><strong>📌 포인트 조회 (/points user get)</strong></summary>
 
 사용자가 현재 보유하고 있는 **포인트**를 조회하는 명령어입니다.
 
@@ -141,6 +137,25 @@
 <img src="/image/points_user_get_result.png" alt="유저 포인트 조회 결과">
 
 </details>
+
+<br>
+
+<details><summary><strong>📌 포인트 사용 (/points user use)</strong></summary>
+
+사용자가 현재 보유하고 있는 **포인트**를 사용하여 **이용 시간**을 구매하는 명령어입니다.
+
+**① 명령어 입력**
+
+`ChronoBot`을 멘션하여 `/points user use` 명령어를 입력합니다.
+`amount` 옵션으로 구매 하고자 하는 포인트 구매 단위를 입력합니다.
+
+<img src="/image/points_user_use_command.png" alt="유저 포인트 사용 명령어">
+
+**② 실행 결과 예시**
+
+이용 시간이 추가되었음을 알리는 메시지가 출력되고, 사용자의 남은 이용 시간이 표시됩니다. 
+
+<img src="/image/points_user_use_result.png" alt="유저 포인트 사용 결과">
 
 </details>
 
