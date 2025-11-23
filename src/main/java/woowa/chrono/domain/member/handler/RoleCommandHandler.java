@@ -10,6 +10,8 @@ import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.config.jda.handler.CommandHandler;
 import woowa.chrono.config.jda.service.DiscordService;
 import woowa.chrono.domain.member.Grade;
+import woowa.chrono.domain.member.dto.request.UpdateMemberRequest;
+import woowa.chrono.domain.member.dto.response.UpdateMemberResponse;
 import woowa.chrono.domain.member.service.MemberService;
 
 @Component
@@ -47,7 +49,13 @@ public class RoleCommandHandler implements CommandHandler {
         var guildId = event.getGuild().getId();
 
         try {
-            memberService.updateMemberGrade(callerId, targetUserId, newGrade);
+            UpdateMemberRequest request = UpdateMemberRequest.builder()
+                    .adminId(callerId)
+                    .userId(targetUserId)
+                    .grade(newGrade)
+                    .build();
+
+            UpdateMemberResponse response = memberService.updateMemberGrade(request);
 
             discordService.updateMemberRole(guildId, targetUserId, role,
                     Grade.getAllRoleNames());

@@ -18,7 +18,7 @@
 * [사용자 가이드](#사용자-가이드)
 ---
 
-## 🛠 기술 스택
+## 💻 기술 스택
 
 ![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat&logo=java&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/SpringBoot-6DB33F?style=flat&logo=spring&logoColor=white)
@@ -30,7 +30,7 @@
 
 ---
 
-## 주요-기능-목록 (Core Features)
+## ⚙️ 주요-기능-목록 (Core Features)
 
 - **포인트 시스템**: 학습 활동으로 포인트 획득 및 이용시간 구매
 - **이용시간 관리**: 포인트로 충전한 이용시간으로 타이머 실행 가능
@@ -42,7 +42,7 @@
 
 ---
 
-## 실행-방법 (How to Run)
+## ▶️ 실행-방법 (How to Run)
 
 1. **환경 변수 설정 (.env 또는 application.yml)**
     ```text
@@ -65,7 +65,7 @@
 
 ---
 
-## 배포-환경 (Deployment environment)
+## ☁️ 배포-환경 (Deployment environment)
 
 - **AWS**: RDS(MySQL) 사용, EC2 혹은 컨테이너 기반 배포 가능
 - **JVM**: Java 21

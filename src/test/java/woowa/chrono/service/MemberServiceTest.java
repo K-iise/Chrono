@@ -13,7 +13,9 @@ import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.domain.member.Grade;
 import woowa.chrono.domain.member.Member;
 import woowa.chrono.domain.member.dto.request.MemberRegisterRequest;
+import woowa.chrono.domain.member.dto.request.UpdateMemberRequest;
 import woowa.chrono.domain.member.dto.response.MemberRegisterResponse;
+import woowa.chrono.domain.member.dto.response.UpdateMemberResponse;
 import woowa.chrono.domain.member.repository.MemberRepository;
 import woowa.chrono.domain.member.service.MemberService;
 
@@ -53,7 +55,10 @@ public class MemberServiceTest {
         memberRepository.save(admin);
 
         // when
-        Member found = memberService.updateMemberGrade(admin.getUserId(), member.getUserId(), Grade.REGULAR);
+        UpdateMemberRequest request = UpdateMemberRequest.builder().adminId(admin.getUserId())
+                .userId(member.getUserId())
+                .grade(Grade.REGULAR).build();
+        UpdateMemberResponse found = memberService.updateMemberGrade(request);
 
         // then
         assertThat(found.getGrade()).isEqualTo(Grade.REGULAR);

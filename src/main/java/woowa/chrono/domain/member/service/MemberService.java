@@ -10,8 +10,10 @@ import woowa.chrono.domain.member.Grade;
 import woowa.chrono.domain.member.Member;
 import woowa.chrono.domain.member.dto.request.AdminRegisterRequest;
 import woowa.chrono.domain.member.dto.request.MemberRegisterRequest;
+import woowa.chrono.domain.member.dto.request.UpdateMemberRequest;
 import woowa.chrono.domain.member.dto.response.AdminRegisterResponse;
 import woowa.chrono.domain.member.dto.response.MemberRegisterResponse;
+import woowa.chrono.domain.member.dto.response.UpdateMemberResponse;
 import woowa.chrono.domain.member.repository.MemberRepository;
 
 @Service
@@ -36,10 +38,10 @@ public class MemberService {
     }
 
     // 회원 등급 변경
-    public Member updateMemberGrade(String adminId, String userId, Grade grade) {
-        Member member = findAdminAndMember(adminId, userId);
-        member.changeGrade(grade);
-        return member;
+    public UpdateMemberResponse updateMemberGrade(UpdateMemberRequest request) {
+        Member member = findAdminAndMember(request.getAdminId(), request.getUserId());
+        member.changeGrade(request.getGrade());
+        return UpdateMemberResponse.from(member);
     }
 
     // 회원 사용 시간 조회
