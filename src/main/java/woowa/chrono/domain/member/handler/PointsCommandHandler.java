@@ -10,11 +10,12 @@ import org.springframework.stereotype.Component;
 import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.common.util.DurationUtils;
 import woowa.chrono.config.jda.handler.CommandHandler;
-import woowa.chrono.domain.member.Member;
 import woowa.chrono.domain.member.dto.request.GetPointRequest;
 import woowa.chrono.domain.member.dto.request.ModifyPointRequest;
+import woowa.chrono.domain.member.dto.request.ModifyUsageTimeRequest;
 import woowa.chrono.domain.member.dto.response.GetPointResponse;
 import woowa.chrono.domain.member.dto.response.ModifyPointResponse;
+import woowa.chrono.domain.member.dto.response.ModifyUsageTimeResponse;
 import woowa.chrono.domain.member.service.MemberService;
 
 @Component
@@ -75,12 +76,12 @@ public class PointsCommandHandler implements CommandHandler {
 
                 case "use" -> {
                     int amount = event.getOption("amount").getAsInt();
-                    Member member = memberService.purchaseUsageTime(userId, amount);
-
+                    ModifyUsageTimeRequest request = ModifyUsageTimeRequest.builder().userId(userId).usageTime(amount)
+                            .build();
+                    ModifyUsageTimeResponse response = memberService.purchaseUsageTime(request);
                     event.getHook().sendMessage(
-                            mention + "님의 현재 남은 포인트는 **" + member.getPoint() + "**입니다.\n"
-                                    + "남은 이용 시간: " + DurationUtils.format(member.getUsageTime())
-                    ).queue();
+                                    mention + "님의 현재 남은 이용 시간은 **" + DurationUtils.format(response.getUsageTime()) + "**입니다.\n")
+                            .queue();
                 }
 
                 default -> event.getHook().sendMessage("알 수 없는 명령어입니다.").queue();

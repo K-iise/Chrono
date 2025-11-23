@@ -93,18 +93,18 @@ public class MemberService {
     }
 
     // 이용 시간 구매
-    public Member purchaseUsageTime(String userId, int point) {
-        Member member = findMember(userId, false);
-        if (point % POINT_PER_HOUR != 0) {
+    public ModifyUsageTimeResponse purchaseUsageTime(ModifyUsageTimeRequest request) {
+        Member member = findMember(request.getUserId(), false);
+        if (request.getUsageTime() % POINT_PER_HOUR != 0) {
             throw new ChronoException(ErrorCode.PURCHASE_UNIT);
         }
-        if (member.getPoint() < point) {
+        if (member.getPoint() < request.getUsageTime()) {
             throw new ChronoException(ErrorCode.HAVE_POINT);
         }
-        member.usePoint(point);
-        member.addUsageTime(Duration.ofHours(point / POINT_PER_HOUR));
+        member.usePoint(request.getUsageTime());
+        member.addUsageTime(Duration.ofHours(request.getUsageTime() / POINT_PER_HOUR));
 
-        return member;
+        return ModifyUsageTimeResponse.from(member);
     }
 
     // 회원 조회 (관리자 검증 옵션)
