@@ -123,7 +123,8 @@
 <details>
 <summary><strong>포인트 및 이용시간 관리 (/points & /time)</strong></summary>
 
-#### 1. 내 포인트 조회 (`/points user get`)
+<details>
+<summary><strong>포인트 조회 (/points user get)</strong></summary>
 
 사용자가 현재 보유하고 있는 **포인트**를 조회하는 명령어입니다.
 
@@ -138,6 +139,8 @@
 사용자의 보유 포인트가 표시됩니다. 포인트는 학습 활동(공부 기록)을 통해 획득하며, 이 포인트로 이용 시간을 구매합니다.
 
 <img src="/image/points_user_get_result.png" alt="유저 포인트 조회 결과">
+
+</details>
 
 </details>
 
