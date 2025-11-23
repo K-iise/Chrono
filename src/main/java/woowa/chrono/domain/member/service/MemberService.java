@@ -9,9 +9,11 @@ import woowa.chrono.common.exception.ErrorCode;
 import woowa.chrono.domain.member.Grade;
 import woowa.chrono.domain.member.Member;
 import woowa.chrono.domain.member.dto.request.AdminRegisterRequest;
+import woowa.chrono.domain.member.dto.request.GetUsageTimeRequest;
 import woowa.chrono.domain.member.dto.request.MemberRegisterRequest;
 import woowa.chrono.domain.member.dto.request.UpdateMemberRequest;
 import woowa.chrono.domain.member.dto.response.AdminRegisterResponse;
+import woowa.chrono.domain.member.dto.response.GetUsageTimeResponse;
 import woowa.chrono.domain.member.dto.response.MemberRegisterResponse;
 import woowa.chrono.domain.member.dto.response.UpdateMemberResponse;
 import woowa.chrono.domain.member.repository.MemberRepository;
@@ -45,9 +47,9 @@ public class MemberService {
     }
 
     // 회원 사용 시간 조회
-    public Duration getUsageTime(String userId) {
-        Member found = findMember(userId, false);
-        return found.getUsageTime();
+    public GetUsageTimeResponse getUsageTime(GetUsageTimeRequest request) {
+        Member member = findMember(request.getUserId(), false);
+        return GetUsageTimeResponse.from(member);
     }
 
     // 회원 포인트 조회

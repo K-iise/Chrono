@@ -1,6 +1,5 @@
 package woowa.chrono.domain.member.handler;
 
-import java.time.Duration;
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -10,6 +9,8 @@ import org.springframework.stereotype.Component;
 import woowa.chrono.common.util.DurationUtils;
 import woowa.chrono.config.jda.handler.CommandHandler;
 import woowa.chrono.domain.member.Grade;
+import woowa.chrono.domain.member.dto.request.GetUsageTimeRequest;
+import woowa.chrono.domain.member.dto.response.GetUsageTimeResponse;
 import woowa.chrono.domain.member.service.MemberService;
 
 @Component
@@ -47,9 +48,10 @@ public class UsageTimeCommandHandler implements CommandHandler {
 
     private void handleGet(SlashCommandInteractionEvent event) {
         String userId = event.getUser().getId();
-        Duration time = memberService.getUsageTime(userId);
+        GetUsageTimeRequest request = GetUsageTimeRequest.builder().userId(userId).build();
+        GetUsageTimeResponse response = memberService.getUsageTime(request);
         event.reply(event.getUser().getAsMention() + "님이 보유한 이용 시간은 " +
-                DurationUtils.format(time) + "입니다.").queue();
+                DurationUtils.format(response.getUsageTime()) + "입니다.").queue();
     }
 
     @Override

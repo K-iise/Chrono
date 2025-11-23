@@ -32,7 +32,7 @@ public class RoleCommandHandler implements CommandHandler {
 
     @Override
     public String getDescription() {
-        return "사용자의 등급을 변경합니다.";
+        return "(관리자 기능) 사용자의 등급을 변경합니다.";
     }
 
     @Override
