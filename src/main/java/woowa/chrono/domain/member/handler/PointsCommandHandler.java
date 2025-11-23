@@ -128,7 +128,7 @@ public class PointsCommandHandler implements CommandHandler {
         return List.of(
                 new SubcommandGroupData("user", "일반 사용자용 포인트 명령어")
                         .addSubcommands(
-                                new SubcommandData("get", "본인 포인트 확인"),
+                                new SubcommandData("get", "현재 보유하고 있는 포인트 잔액을 확인합니다."),
                                 new SubcommandData("use", "포인트 사용")
                                         .addOptions(new OptionData(OptionType.INTEGER, "amount",
                                                 "포인트 구매 단위는 1000P당 1시간 이용 시간이 충전됩니다.", true))
