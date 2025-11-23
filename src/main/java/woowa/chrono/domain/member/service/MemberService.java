@@ -107,18 +107,16 @@ public class MemberService {
 
     // 관리자 등록 (최초 실행 시에만 사용)
     public Member registerAdmin(String userId, String userName, String channelId) {
-
         if (hasAdmin()) {
             throw new ChronoException(ErrorCode.EXIST_ADMIN);
         }
-
         Member admin = Member.builder().userId(userId).userName(userName).grade(Grade.ADMIN).channelId(channelId)
                 .build();
-        validateDuplication(admin);
         memberRepository.save(admin);
         return admin;
     }
 
+    // 관리자 존재 여부 조회
     private boolean hasAdmin() {
         return memberRepository.existsByGrade(Grade.ADMIN);
     }
@@ -135,6 +133,14 @@ public class MemberService {
         if (memberRepository.findByUserId(member.getUserId()).isPresent()) {
             throw new ChronoException(ErrorCode.DUPLICATE_MEMBER);
         }
+    }
+
+    // 개인 채널 ID 변경
+    public Member updateChannelId(String userId, String channelId) {
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new ChronoException(ErrorCode.MEMBER_NOT_FOUND));
+        member.updateChannelId(channelId);
+        return member;
     }
 
 

@@ -42,9 +42,14 @@ public class CommandListener extends ListenerAdapter {
         try {
             // 호출자 등급 조회
             String callerId = event.getUser().getId();
-            Grade callerGrade = memberService.findMember(callerId, true).getGrade();
 
-            // 공통 권한 체크
+            Grade callerGrade = null;
+            if (handler.requiredGrade() != null) {
+                // 등급 체크가 필요한 경우에만 DB 조회
+                callerGrade = memberService.findMember(callerId, true).getGrade();
+            }
+
+            // 권한 체크
             if (!hasPermission(callerGrade, handler.requiredGrade())) {
                 event.reply(ErrorCode.NOT_ADMIN.getMessage())
                         .setEphemeral(true)
@@ -60,6 +65,9 @@ public class CommandListener extends ListenerAdapter {
     }
 
     private boolean hasPermission(Grade caller, Grade required) {
+        if (required == null) {
+            return true; // 권한 체크 필요 없는 커맨드
+        }
         return caller.ordinal() >= required.ordinal();
     }
 

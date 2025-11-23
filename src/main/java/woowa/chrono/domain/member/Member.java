@@ -89,6 +89,10 @@ public class Member {
         this.point = point;
     }
 
+    public void updateChannelId(String channelId) {
+        this.channelId = channelId;
+    }
+
     private void validatePositivePoint(int point) {
         if (point < 0) {
             throw new ChronoException(ErrorCode.INVALID_POINT);

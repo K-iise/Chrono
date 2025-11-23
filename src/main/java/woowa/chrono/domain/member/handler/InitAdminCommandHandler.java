@@ -1,7 +1,10 @@
 package woowa.chrono.domain.member.handler;
 
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.springframework.stereotype.Component;
 import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.config.jda.handler.CommandHandler;
@@ -9,6 +12,7 @@ import woowa.chrono.config.jda.service.DiscordService;
 import woowa.chrono.domain.member.Grade;
 import woowa.chrono.domain.member.service.MemberService;
 
+@Slf4j
 @Component
 public class InitAdminCommandHandler implements CommandHandler {
 
@@ -23,7 +27,7 @@ public class InitAdminCommandHandler implements CommandHandler {
 
     @Override
     public String getName() {
-        return "initAdmin";
+        return "setup";
     }
 
     @Override
@@ -33,8 +37,9 @@ public class InitAdminCommandHandler implements CommandHandler {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
+        var user = event.getUser();
         try {
-            var user = event.getUser(); // 커맨드를 실행한 유저(서버 주인)
+            memberService.registerAdmin(user.getId(), user.getName(), null);
 
             // Discord 개인 채널 생성
             TextChannel channel = discordService.createPersonalChannel(
@@ -43,7 +48,8 @@ public class InitAdminCommandHandler implements CommandHandler {
                     user.getName()
             );
 
-            memberService.registerAdmin(user.getId(), user.getName(), channel.getId());
+            // 생성된 채널 ID DB 업데이트
+            memberService.updateChannelId(user.getId(), channel.getId());
             event.reply(user.getAsMention() + "님을 관리자로 등록했습니다.").queue();
 
         } catch (ChronoException e) {
@@ -54,5 +60,10 @@ public class InitAdminCommandHandler implements CommandHandler {
     @Override
     public Grade requiredGrade() {
         return null; // 권한 체크 없음
+    }
+
+    @Override
+    public List<OptionData> getOptions() {
+        return CommandHandler.super.getOptions();
     }
 }
