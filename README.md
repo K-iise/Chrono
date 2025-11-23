@@ -119,7 +119,7 @@
 ## 🛠️ 트러블 슈팅 (Trouble Shooting)
 
 <details>
-<summary>⚡ Slash Command 3초 응답 제한 초과 오류 (Timeout Error)</summary>
+<summary><strong>⚡ Slash Command 3초 응답 제한 초과 오류 (Timeout Error)</strong></summary>
 
 ### ❗ 문제 현상 (Symptom)
 데이터베이스 조회, 복잡한 계산 등 **처리 시간이 3초를 초과**하는 작업 수행 시, 최종 응답(reply)에서 아래와 같은 오류가 발생합니다.
@@ -131,15 +131,17 @@
 ### 🔍 원인 (Cause)
 Discord API는 슬래시 커맨드(`Slash Command`)와 같은 **모든 상호작용(Interaction)** 발생 시, **최대 3초 이내에 봇이 응답했다는 것을 반드시 알려야**(`Acknowledge`, ACK) 합니다.
 
-* **ACK 실패:** 3초 안에 응답하지 않으면 디스코드는 해당 Interaction을 **'만료됨(Expired)'** 상태로 간주하고, 최종 응답을 위한 `event.reply()` 호출 시 **"이미 응답되었거나 만료된 상호작용"**이라는 오류가 발생합니다.
+* **ACK 실패:** 3초 안에 응답하지 않으면 디스코드는 해당 Interaction을 **만료됨(Expired)** 상태로 간주하고, 최종 응답을 위한 `event.reply()` 호출 시 **이미 응답되었거나 만료된 상호작용**이라는 오류가 발생합니다.
+
+---
 
 ### ✅ 해결 방법 (Solution)
 
-작업에 시간이 걸리는 경우, **실제 작업 실행 전에 먼저 디스코드에 응답을 미룬다는 ACK**를 보냅니다. 이후 최종 응답은 **웹훅(Webhook)**을 통해 안전하게 처리합니다.
+작업에 시간이 걸리는 경우, **실제 작업 실행 전에 먼저 디스코드에 응답을 미룬다는 ACK**를 보냅니다. 이후 최종 응답은 **웹훅(Webhook**)을 통해 안전하게 처리합니다.
 
 #### 1. `deferReply()`로 즉시 응답 ACK 처리
 
-시간이 걸리는 로직을 실행하기 **직전에** `deferReply()`를 호출하여 디스코드에게 **"응답 처리 중입니다. 잠시 기다려주세요."**라는 상태를 즉시 알립니다.
+시간이 걸리는 로직을 실행하기 **직전에** `deferReply()`를 호출하여 디스코드에게 **응답 처리 중입니다. 잠시 기다려주세요.** 라는 상태를 즉시 알립니다.
 
 ```java
 event.deferReply(true).queue(); // 즉시 ACK 처리.
