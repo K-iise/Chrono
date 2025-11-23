@@ -86,10 +86,10 @@ public class MemberService {
     }
 
     // 회원 포인트 수정 (관리자 권한 필수)
-    public Member updatePoint(String adminId, String userId, int point) {
-        Member member = findAdminAndMember(adminId, userId);
-        member.updatePoint(point);
-        return member;
+    public ModifyPointResponse updatePoint(ModifyPointRequest request) {
+        Member member = findAdminAndMember(request.getAdminId(), request.getUserId());
+        member.updatePoint(request.getPoint());
+        return ModifyPointResponse.from(member);
     }
 
     // 이용 시간 구매

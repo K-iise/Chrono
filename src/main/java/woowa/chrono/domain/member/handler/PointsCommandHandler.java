@@ -113,10 +113,12 @@ public class PointsCommandHandler implements CommandHandler {
             }
             case "set" -> {
                 int setPoint = event.getOption("amount").getAsInt();
-                memberService.updatePoint(event.getUser().getId(), targetUserId, setPoint);
-                event.reply(mention + "님의 포인트를 **" + setPoint + "**로 설정했습니다.").setEphemeral(true).queue();
+                ModifyPointRequest request = ModifyPointRequest.builder().adminId(adminId)
+                        .userId(targetUserId).point(setPoint).build();
+                ModifyPointResponse response = memberService.updatePoint(request);
+                event.getHook().sendMessage(mention + "님의 포인트를 **" + response.getPoint() + "**으(로) 설정했습니다.").queue();
             }
-            default -> event.reply("알 수 없는 명령어입니다.").setEphemeral(true).queue();
+            default -> event.getHook().sendMessage("알 수 없는 명령어입니다.").queue();
         }
     }
 

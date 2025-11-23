@@ -307,10 +307,12 @@ public class MemberServiceTest {
 
         // when
         int point = 100;
-        Member updatedMember = memberService.updatePoint(admin.getUserId(), member.getUserId(), point);
+        ModifyPointRequest request = ModifyPointRequest.builder()
+                .adminId(admin.getUserId()).userId(member.getUserId()).point(point).build();
+        ModifyPointResponse response = memberService.updatePoint(request);
 
         // then
-        assertThat(updatedMember.getPoint()).isEqualTo(point);
+        Assertions.assertThat(response.getPoint()).isEqualTo(point);
     }
 
     @Test
@@ -325,7 +327,9 @@ public class MemberServiceTest {
 
         // when & then
         int point = 100;
-        Assertions.assertThatThrownBy(() -> memberService.updatePoint(regular.getUserId(), member.getUserId(), point))
+        ModifyPointRequest request = ModifyPointRequest.builder()
+                .adminId(regular.getUserId()).userId(member.getUserId()).point(point).build();
+        Assertions.assertThatThrownBy(() -> memberService.updatePoint(request))
                 .isInstanceOf(ChronoException.class);
     }
 
@@ -335,9 +339,10 @@ public class MemberServiceTest {
         // given
         Member admin = Member.builder().userId("admin").grade(Grade.ADMIN).build();
         int point = 100;
-
+        ModifyPointRequest request = ModifyPointRequest.builder()
+                .adminId(admin.getUserId()).userId("test").point(point).build();
         // when & then
-        Assertions.assertThatThrownBy(() -> memberService.updatePoint(admin.getUserId(), "test", point))
+        Assertions.assertThatThrownBy(() -> memberService.updatePoint(request))
                 .isInstanceOf(ChronoException.class);
     }
 }
