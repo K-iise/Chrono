@@ -55,7 +55,7 @@ public class PointsCommandHandler implements CommandHandler {
     }
 
     private void handleUserCommand(SlashCommandInteractionEvent event, String subCommand) {
-        event.deferReply(true).queue(); // ❶ 3초 안에 즉시 ACK
+        event.deferReply(true).queue();
 
         String userId = event.getUser().getId();
         String mention = event.getUser().getAsMention();

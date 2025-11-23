@@ -42,13 +42,15 @@ public class RoleCommandHandler implements CommandHandler {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
-        String callerId = event.getUser().getId();
-        var targetUserId = event.getOption("user").getAsUser().getId();
-        var role = event.getOption("role").getAsRole();
-        var newGrade = Grade.fromRoleName(role.getName());
-        var guildId = event.getGuild().getId();
-
         try {
+            event.deferReply(true).queue();
+
+            String callerId = event.getUser().getId();
+            var targetUserId = event.getOption("user").getAsUser().getId();
+            var role = event.getOption("role").getAsRole();
+            var newGrade = Grade.fromRoleName(role.getName());
+            var guildId = event.getGuild().getId();
+
             UpdateMemberRequest request = UpdateMemberRequest.builder()
                     .adminId(callerId)
                     .userId(targetUserId)
@@ -60,10 +62,10 @@ public class RoleCommandHandler implements CommandHandler {
             discordService.updateMemberRole(guildId, targetUserId, role,
                     Grade.getAllRoleNames());
 
-            event.reply(event.getOption("user").getAsUser().getAsMention() +
-                    "님의 등급이 **" + newGrade.getDisplayName() + "**(으)로 변경되었습니다.").setEphemeral(true).queue();
+            event.getHook().sendMessage(event.getOption("user").getAsUser().getAsMention() +
+                    "님의 등급이 **" + newGrade.getDisplayName() + "**(으)로 변경되었습니다.").queue();
         } catch (ChronoException e) {
-            event.reply(e.getMessage()).setEphemeral(true).queue();
+            event.getHook().sendMessage(e.getMessage()).queue();
         }
 
     }

@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.stereotype.Component;
+import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.common.util.DurationUtils;
 import woowa.chrono.config.jda.handler.CommandHandler;
 import woowa.chrono.domain.member.Grade;
@@ -47,11 +48,18 @@ public class UsageTimeCommandHandler implements CommandHandler {
     }
 
     private void handleGet(SlashCommandInteractionEvent event) {
-        String userId = event.getUser().getId();
-        GetUsageTimeRequest request = GetUsageTimeRequest.builder().userId(userId).build();
-        GetUsageTimeResponse response = memberService.getUsageTime(request);
-        event.reply(event.getUser().getAsMention() + "님이 보유한 이용 시간은 " +
-                DurationUtils.format(response.getUsageTime()) + "입니다.").queue();
+        try {
+            event.deferReply(true).queue();
+
+            String userId = event.getUser().getId();
+            GetUsageTimeRequest request = GetUsageTimeRequest.builder().userId(userId).build();
+            GetUsageTimeResponse response = memberService.getUsageTime(request);
+            
+            event.getHook().sendMessage(event.getUser().getAsMention() + "님이 보유한 이용 시간은 " +
+                    DurationUtils.format(response.getUsageTime()) + "입니다.").queue();
+        } catch (ChronoException e) {
+            event.getHook().sendMessage(e.getMessage()).queue();
+        }
     }
 
     @Override

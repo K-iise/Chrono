@@ -33,7 +33,7 @@ public class RegisterCommandHandler implements CommandHandler {
 
     @Override
     public String getDescription() {
-        return "관리자가 사용자를 등록합니다.";
+        return "(관리자 기능) 사용자를 등록합니다.";
     }
 
     @Override
@@ -44,6 +44,7 @@ public class RegisterCommandHandler implements CommandHandler {
     @Override
     public void handle(SlashCommandInteractionEvent event) {
         try {
+            event.deferReply(true).queue();
             var targetUser = event.getOption("user").getAsUser();
 
             // 멤버 등록
@@ -62,10 +63,10 @@ public class RegisterCommandHandler implements CommandHandler {
             );
 
             memberService.updateChannelId(response.getUserId(), channel.getId());
-            event.reply(targetUser.getAsMention() + "님을 등록했습니다.").setEphemeral(true).queue();
+            event.getHook().sendMessage(targetUser.getAsMention() + "님을 등록했습니다.").queue();
 
         } catch (ChronoException e) {
-            event.reply(e.getMessage()).setEphemeral(true).queue();
+            event.getHook().sendMessage(e.getMessage()).queue();
         }
     }
 
