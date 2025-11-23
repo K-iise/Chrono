@@ -147,7 +147,7 @@ Discord API는 슬래시 커맨드(`Slash Command`)와 같은 **모든 상호작
 event.deferReply(true).queue(); // 즉시 ACK 처리.
 ```
 
-### 2. getHook().sendMessage()로 안전하게 최종 응답
+#### 2. getHook().sendMessage()로 안전하게 최종 응답
 오래 걸리는 작업이 완료된 후, event.getHook()을 사용하여 응답 웹훅을 통해 최종 메시지를 보냅니다. 웹훅을 사용하면 3초 제한을 우회하여 최대 15분 이내에 안전하게 응답할 수 있습니다.
 
 ```java

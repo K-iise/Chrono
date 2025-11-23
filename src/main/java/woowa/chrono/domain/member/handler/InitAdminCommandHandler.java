@@ -39,11 +39,12 @@ public class InitAdminCommandHandler implements CommandHandler {
 
     @Override
     public void handle(SlashCommandInteractionEvent event) {
+        event.deferReply(true).queue();
         var user = event.getUser();
         try {
             AdminRegisterRequest request = AdminRegisterRequest.builder().
                     userId(user.getId()).userName(user.getName()).channelId(null).build();
-            
+
             AdminRegisterResponse response = memberService.registerAdmin(request);
 
             // Discord 개인 채널 생성
@@ -55,10 +56,10 @@ public class InitAdminCommandHandler implements CommandHandler {
 
             // 생성된 채널 ID DB 업데이트
             memberService.updateChannelId(user.getId(), channel.getId());
-            event.reply(user.getAsMention() + "님을 관리자로 등록했습니다.").queue();
+            event.getHook().sendMessage(user.getAsMention() + "님을 관리자로 등록했습니다.").queue();
 
         } catch (ChronoException e) {
-            event.reply(e.getMessage()).setEphemeral(true).queue();
+            event.getHook().sendMessage(e.getMessage()).queue();
         }
     }
 
