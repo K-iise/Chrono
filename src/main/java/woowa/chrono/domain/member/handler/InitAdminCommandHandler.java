@@ -10,6 +10,8 @@ import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.config.jda.handler.CommandHandler;
 import woowa.chrono.config.jda.service.DiscordService;
 import woowa.chrono.domain.member.Grade;
+import woowa.chrono.domain.member.dto.request.AdminRegisterRequest;
+import woowa.chrono.domain.member.dto.response.AdminRegisterResponse;
 import woowa.chrono.domain.member.service.MemberService;
 
 @Slf4j
@@ -24,7 +26,7 @@ public class InitAdminCommandHandler implements CommandHandler {
         this.discordService = discordService;
 
     }
-    
+
     @Override
     public String getName() {
         return "setup";
@@ -39,7 +41,10 @@ public class InitAdminCommandHandler implements CommandHandler {
     public void handle(SlashCommandInteractionEvent event) {
         var user = event.getUser();
         try {
-            memberService.registerAdmin(user.getId(), user.getName(), null);
+            AdminRegisterRequest request = AdminRegisterRequest.builder().
+                    userId(user.getId()).userName(user.getName()).channelId(null).build();
+            
+            AdminRegisterResponse response = memberService.registerAdmin(request);
 
             // Discord 개인 채널 생성
             TextChannel channel = discordService.createPersonalChannel(

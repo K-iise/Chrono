@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
 import org.springframework.stereotype.Component;
+import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.common.util.DurationUtils;
 import woowa.chrono.config.jda.handler.CommandHandler;
 import woowa.chrono.domain.member.Member;
@@ -46,7 +47,7 @@ public class PointsCommandHandler implements CommandHandler {
                 case "admin" -> handleAdminCommand(event, subCommand);
                 default -> event.reply("알 수 없는 명령어 그룹입니다.").setEphemeral(true).queue();
             }
-        } catch (RuntimeException e) {
+        } catch (ChronoException e) {
             event.reply(e.getMessage()).setEphemeral(true).queue();
         }
     }

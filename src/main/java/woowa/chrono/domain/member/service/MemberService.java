@@ -8,7 +8,9 @@ import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.common.exception.ErrorCode;
 import woowa.chrono.domain.member.Grade;
 import woowa.chrono.domain.member.Member;
+import woowa.chrono.domain.member.dto.request.AdminRegisterRequest;
 import woowa.chrono.domain.member.dto.request.MemberRegisterRequest;
+import woowa.chrono.domain.member.dto.response.AdminRegisterResponse;
 import woowa.chrono.domain.member.dto.response.MemberRegisterResponse;
 import woowa.chrono.domain.member.repository.MemberRepository;
 
@@ -106,14 +108,13 @@ public class MemberService {
     }
 
     // 관리자 등록 (최초 실행 시에만 사용)
-    public Member registerAdmin(String userId, String userName, String channelId) {
+    public AdminRegisterResponse registerAdmin(AdminRegisterRequest request) {
         if (hasAdmin()) {
             throw new ChronoException(ErrorCode.EXIST_ADMIN);
         }
-        Member admin = Member.builder().userId(userId).userName(userName).grade(Grade.ADMIN).channelId(channelId)
-                .build();
+        Member admin = request.toEntity();
         memberRepository.save(admin);
-        return admin;
+        return AdminRegisterResponse.from(admin);
     }
 
     // 관리자 존재 여부 조회
