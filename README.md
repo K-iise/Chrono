@@ -11,11 +11,13 @@
 
 ---
 
-## 📌 목차
-* [기능 목록](#기능-목록)
-* [실행 방법](#실행-방법)
-* [배포 환경](#배포-환경)
-* [사용자 가이드](#사용자-가이드)
+## 📖 목차 (Table of Contents)
+* [⚙️ 주요 기능 목록](#주요-기능-목록)
+* [💻 기술 스택](#기술-스택)
+* [▶️ 실행 방법](#실행-방법)
+* [☁️ 배포 환경](#배포-환경)
+* [📘 사용자 가이드](#사용자-가이드)
+* [🛠️ 트러블 슈팅](#트러블-슈팅)
 ---
 
 ## 💻 기술 스택
@@ -75,12 +77,12 @@
 
 ## 📘 사용자 가이드 (User Guide)
 
-### 🛠️ 관리자 등록 (setup)
+### 🔑 관리자 기능 (Admin Features)
 
 <details>
-<summary><strong>서버 최초 관리자 등록 방법</strong></summary>
+<summary><strong>관리자 등록(/setup)</strong></summary>
 
-#### 1. `setup` 명령어 실행
+#### 1. `/setup` 명령어 실행
 서버 최초 1회, 아래 명령어 입력을 통해 **관리자 계정을 등록**합니다.
 
 <img src="/image/setup_command.png" alt="최초 관리자 등록 명령어">
@@ -115,6 +117,13 @@
 </details>
 
 ---
+
+### 👤 일반 사용자 기능 (General User Features)
+
+<details>
+<summary><strong>포인트 및 이용시간 관리 (/points & /time)</strong></summary>
+
+</details>
 
 ## 🛠️ 트러블 슈팅 (Trouble Shooting)
 
