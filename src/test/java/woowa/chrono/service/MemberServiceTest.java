@@ -15,11 +15,13 @@ import woowa.chrono.domain.member.Member;
 import woowa.chrono.domain.member.dto.request.GetPointRequest;
 import woowa.chrono.domain.member.dto.request.GetUsageTimeRequest;
 import woowa.chrono.domain.member.dto.request.MemberRegisterRequest;
+import woowa.chrono.domain.member.dto.request.ModifyPointRequest;
 import woowa.chrono.domain.member.dto.request.ModifyUsageTimeRequest;
 import woowa.chrono.domain.member.dto.request.UpdateMemberRequest;
 import woowa.chrono.domain.member.dto.response.GetPointResponse;
 import woowa.chrono.domain.member.dto.response.GetUsageTimeResponse;
 import woowa.chrono.domain.member.dto.response.MemberRegisterResponse;
+import woowa.chrono.domain.member.dto.response.ModifyPointResponse;
 import woowa.chrono.domain.member.dto.response.ModifyUsageTimeResponse;
 import woowa.chrono.domain.member.dto.response.UpdateMemberResponse;
 import woowa.chrono.domain.member.repository.MemberRepository;
@@ -249,10 +251,13 @@ public class MemberServiceTest {
 
         // when
         int addpoint = 1000;
-        Member test = memberService.increasePoint(admin.getUserId(), regular.getUserId(), addpoint);
+        ModifyPointRequest request = ModifyPointRequest.builder().adminId(admin.getUserId()).userId(regular.getUserId())
+                .point(addpoint).build();
+
+        ModifyPointResponse response = memberService.increasePoint(request);
 
         // then
-        assertThat(test.getPoint()).isEqualTo(addpoint);
+        assertThat(response.getPoint()).isEqualTo(addpoint);
     }
 
     @Test
@@ -267,8 +272,11 @@ public class MemberServiceTest {
 
         // when & then
         int addpoint = 100;
+        ModifyPointRequest request = ModifyPointRequest.builder().adminId(notAdmin.getUserId())
+                .userId(regular.getUserId())
+                .point(addpoint).build();
         Assertions.assertThatThrownBy(() ->
-                        memberService.increasePoint(notAdmin.getUserId(), regular.getUserId(), addpoint))
+                        memberService.increasePoint(request))
                 .isInstanceOf(ChronoException.class);
     }
 
@@ -277,11 +285,13 @@ public class MemberServiceTest {
     public void increasePointUserNotFoundTest() {
         // given
         Member admin = Member.builder().userId("admin").grade(Grade.ADMIN).build();
-        int addpoint = 100;
         memberRepository.save(admin);
 
+        int addpoint = 100;
+        ModifyPointRequest request = ModifyPointRequest.builder().adminId(admin.getUserId()).userId("test")
+                .point(addpoint).build();
         // when & then
-        Assertions.assertThatThrownBy(() -> memberService.increasePoint(admin.getUserId(), "test", addpoint))
+        Assertions.assertThatThrownBy(() -> memberService.increasePoint(request))
                 .isInstanceOf(ChronoException.class);
     }
 

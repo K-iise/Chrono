@@ -12,7 +12,9 @@ import woowa.chrono.common.util.DurationUtils;
 import woowa.chrono.config.jda.handler.CommandHandler;
 import woowa.chrono.domain.member.Member;
 import woowa.chrono.domain.member.dto.request.GetPointRequest;
+import woowa.chrono.domain.member.dto.request.ModifyPointRequest;
 import woowa.chrono.domain.member.dto.response.GetPointResponse;
+import woowa.chrono.domain.member.dto.response.ModifyPointResponse;
 import woowa.chrono.domain.member.service.MemberService;
 
 @Component
@@ -85,27 +87,29 @@ public class PointsCommandHandler implements CommandHandler {
             }
 
         } catch (ChronoException e) {
-            // ❗ reply가 이미 defer 되었기 때문에 hook으로만 응답해야 함
             event.getHook().sendMessage(e.getMessage()).queue();
         }
     }
 
     private void handleAdminCommand(SlashCommandInteractionEvent event, String subCommand) {
-        // 관리자 권한 체크
-        Member admin = memberService.findMember(event.getUser().getId(), true);
+        event.deferReply(true).queue();
 
+        String adminId = event.getUser().getId();
         String targetUserId = event.getOption("user").getAsUser().getId();
-        Member target = memberService.findMember(targetUserId, false);
         String mention = event.getOption("user").getAsUser().getAsMention();
 
         switch (subCommand) {
-            case "get" ->
-                    event.reply(mention + "님이 보유한 포인트는 **" + target.getPoint() + "**입니다.").setEphemeral(true).queue();
+            case "get" -> {
+                GetPointRequest request = GetPointRequest.builder().userId(targetUserId).build();
+                GetPointResponse response = memberService.getPoint(request);
+                event.getHook().sendMessage(mention + "님이 보유한 포인트는 **" + response.getPoint() + "**입니다.").queue();
+            }
             case "add" -> {
                 int addPoint = event.getOption("amount").getAsInt();
-                memberService.increasePoint(event.getUser().getId(), targetUserId, addPoint);
-                event.reply(mention + "님에게 **" + addPoint + "** 포인트가 추가되었습니다").setEphemeral(true)
-                        .queue();
+                ModifyPointRequest request = ModifyPointRequest.builder().adminId(adminId)
+                        .userId(targetUserId).point(addPoint).build();
+                ModifyPointResponse response = memberService.increasePoint(request);
+                event.getHook().sendMessage(mention + "님에게 **" + response.getPoint() + "** 포인트가 추가되었습니다").queue();
             }
             case "set" -> {
                 int setPoint = event.getOption("amount").getAsInt();

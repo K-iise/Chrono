@@ -12,12 +12,14 @@ import woowa.chrono.domain.member.dto.request.AdminRegisterRequest;
 import woowa.chrono.domain.member.dto.request.GetPointRequest;
 import woowa.chrono.domain.member.dto.request.GetUsageTimeRequest;
 import woowa.chrono.domain.member.dto.request.MemberRegisterRequest;
+import woowa.chrono.domain.member.dto.request.ModifyPointRequest;
 import woowa.chrono.domain.member.dto.request.ModifyUsageTimeRequest;
 import woowa.chrono.domain.member.dto.request.UpdateMemberRequest;
 import woowa.chrono.domain.member.dto.response.AdminRegisterResponse;
 import woowa.chrono.domain.member.dto.response.GetPointResponse;
 import woowa.chrono.domain.member.dto.response.GetUsageTimeResponse;
 import woowa.chrono.domain.member.dto.response.MemberRegisterResponse;
+import woowa.chrono.domain.member.dto.response.ModifyPointResponse;
 import woowa.chrono.domain.member.dto.response.ModifyUsageTimeResponse;
 import woowa.chrono.domain.member.dto.response.UpdateMemberResponse;
 import woowa.chrono.domain.member.repository.MemberRepository;
@@ -77,10 +79,10 @@ public class MemberService {
     }
 
     // 회원 포인트 추가 (관리자 권한 필수)
-    public Member increasePoint(String adminId, String userId, int point) {
-        Member member = findAdminAndMember(adminId, userId);
-        member.addPoint(point);
-        return member;
+    public ModifyPointResponse increasePoint(ModifyPointRequest request) {
+        Member member = findAdminAndMember(request.getAdminId(), request.getUserId());
+        member.addPoint(request.getPoint());
+        return ModifyPointResponse.from(member);
     }
 
     // 회원 포인트 수정 (관리자 권한 필수)
