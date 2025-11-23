@@ -14,13 +14,13 @@ import woowa.chrono.domain.member.Grade;
 import woowa.chrono.domain.member.Member;
 import woowa.chrono.domain.member.dto.request.GetPointRequest;
 import woowa.chrono.domain.member.dto.request.GetUsageTimeRequest;
-import woowa.chrono.domain.member.dto.request.IncreaseUsageTimeRequest;
 import woowa.chrono.domain.member.dto.request.MemberRegisterRequest;
+import woowa.chrono.domain.member.dto.request.ModifyUsageTimeRequest;
 import woowa.chrono.domain.member.dto.request.UpdateMemberRequest;
 import woowa.chrono.domain.member.dto.response.GetPointResponse;
 import woowa.chrono.domain.member.dto.response.GetUsageTimeResponse;
-import woowa.chrono.domain.member.dto.response.IncreaseUsageTimeResponse;
 import woowa.chrono.domain.member.dto.response.MemberRegisterResponse;
+import woowa.chrono.domain.member.dto.response.ModifyUsageTimeResponse;
 import woowa.chrono.domain.member.dto.response.UpdateMemberResponse;
 import woowa.chrono.domain.member.repository.MemberRepository;
 import woowa.chrono.domain.member.service.MemberService;
@@ -120,12 +120,12 @@ public class MemberServiceTest {
 
         // when
         int addTime = 100; // 분 단위라고 가정
-        IncreaseUsageTimeRequest request = IncreaseUsageTimeRequest.builder()
+        ModifyUsageTimeRequest request = ModifyUsageTimeRequest.builder()
                 .adminId(admin.getUserId())
                 .userId(member.getUserId())
                 .usageTime(addTime).build();
 
-        IncreaseUsageTimeResponse response = memberService.increaseUsageTime(request);
+        ModifyUsageTimeResponse response = memberService.increaseUsageTime(request);
 
         // then
         assertThat(response.getUsageTime())
@@ -151,7 +151,7 @@ public class MemberServiceTest {
         memberRepository.save(regular);
         memberRepository.save(member);
 
-        IncreaseUsageTimeRequest request = IncreaseUsageTimeRequest.builder()
+        ModifyUsageTimeRequest request = ModifyUsageTimeRequest.builder()
                 .adminId(regular.getUserId()).userId(member.getUserId()).usageTime(100).build();
 
         // when & then
@@ -172,7 +172,7 @@ public class MemberServiceTest {
 
         memberRepository.save(admin);
 
-        IncreaseUsageTimeRequest request = IncreaseUsageTimeRequest.builder().adminId(admin.getUserId())
+        ModifyUsageTimeRequest request = ModifyUsageTimeRequest.builder().adminId(admin.getUserId())
                 .userId("no-user").usageTime(100).build();
 
         // when & then
@@ -194,7 +194,9 @@ public class MemberServiceTest {
 
         // when
         int updateTime = 100;
-        Member updated = memberService.updateUsageTime(admin.getUserId(), member.getUserId(), updateTime);
+        ModifyUsageTimeRequest request = ModifyUsageTimeRequest.builder()
+                .adminId(admin.getUserId()).userId(member.getUserId()).usageTime(updateTime).build();
+        ModifyUsageTimeResponse updated = memberService.updateUsageTime(request);
 
         // then
         assertThat(updated.getUsageTime().toMinutes()).isEqualTo(100);
@@ -213,8 +215,10 @@ public class MemberServiceTest {
 
         // when & then
         int updateTime = 100;
+        ModifyUsageTimeRequest request = ModifyUsageTimeRequest.builder()
+                .adminId(regular.getUserId()).userId(member.getUserId()).usageTime(updateTime).build();
         Assertions.assertThatThrownBy(
-                        () -> memberService.updateUsageTime(regular.getUserId(), member.getUserId(), updateTime))
+                        () -> memberService.updateUsageTime(request))
                 .isInstanceOf(ChronoException.class);
     }
 
@@ -226,8 +230,10 @@ public class MemberServiceTest {
         memberRepository.save(admin);
         int updateTime = 100;
         // when & then
+        ModifyUsageTimeRequest request = ModifyUsageTimeRequest.builder()
+                .adminId(admin.getUserId()).userId("test1").usageTime(updateTime).build();
         Assertions.assertThatThrownBy(
-                        () -> memberService.updateUsageTime(admin.getUserId(), "test1", updateTime))
+                        () -> memberService.updateUsageTime(request))
                 .isInstanceOf(ChronoException.class);
     }
 

@@ -11,12 +11,12 @@ import woowa.chrono.domain.member.Member;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class IncreaseUsageTimeResponse {
+public class ModifyUsageTimeResponse {
     private String userId;
     private Duration usageTime;
 
-    public static IncreaseUsageTimeResponse from(Member member) {
-        return IncreaseUsageTimeResponse.builder()
+    public static ModifyUsageTimeResponse from(Member member) {
+        return ModifyUsageTimeResponse.builder()
                 .userId(member.getUserId())
                 .usageTime(member.getUsageTime())
                 .build();

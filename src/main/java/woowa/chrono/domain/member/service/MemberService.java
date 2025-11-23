@@ -11,14 +11,14 @@ import woowa.chrono.domain.member.Member;
 import woowa.chrono.domain.member.dto.request.AdminRegisterRequest;
 import woowa.chrono.domain.member.dto.request.GetPointRequest;
 import woowa.chrono.domain.member.dto.request.GetUsageTimeRequest;
-import woowa.chrono.domain.member.dto.request.IncreaseUsageTimeRequest;
 import woowa.chrono.domain.member.dto.request.MemberRegisterRequest;
+import woowa.chrono.domain.member.dto.request.ModifyUsageTimeRequest;
 import woowa.chrono.domain.member.dto.request.UpdateMemberRequest;
 import woowa.chrono.domain.member.dto.response.AdminRegisterResponse;
 import woowa.chrono.domain.member.dto.response.GetPointResponse;
 import woowa.chrono.domain.member.dto.response.GetUsageTimeResponse;
-import woowa.chrono.domain.member.dto.response.IncreaseUsageTimeResponse;
 import woowa.chrono.domain.member.dto.response.MemberRegisterResponse;
+import woowa.chrono.domain.member.dto.response.ModifyUsageTimeResponse;
 import woowa.chrono.domain.member.dto.response.UpdateMemberResponse;
 import woowa.chrono.domain.member.repository.MemberRepository;
 
@@ -63,17 +63,17 @@ public class MemberService {
     }
 
     // 회원 이용 시간 추가 (관리자 권한 필수)
-    public IncreaseUsageTimeResponse increaseUsageTime(IncreaseUsageTimeRequest request) {
+    public ModifyUsageTimeResponse increaseUsageTime(ModifyUsageTimeRequest request) {
         Member member = findAdminAndMember(request.getAdminId(), request.getUserId());
         member.addUsageTime(Duration.ofMinutes(request.getUsageTime()));
-        return IncreaseUsageTimeResponse.from(member);
+        return ModifyUsageTimeResponse.from(member);
     }
 
     // 회원 이용 시간 수정 (관리자 권한 필수)
-    public Member updateUsageTime(String adminId, String userId, int time) {
-        Member member = findAdminAndMember(adminId, userId);
-        member.updateUsageTime(Duration.ofMinutes(time));
-        return member;
+    public ModifyUsageTimeResponse updateUsageTime(ModifyUsageTimeRequest request) {
+        Member member = findAdminAndMember(request.getAdminId(), request.getUserId());
+        member.updateUsageTime(Duration.ofMinutes(request.getUsageTime()));
+        return ModifyUsageTimeResponse.from(member);
     }
 
     // 회원 포인트 추가 (관리자 권한 필수)

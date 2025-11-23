@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class IncreaseUsageTimeRequest {
+public class ModifyUsageTimeRequest {
     private String adminId;
     private String userId;
     private int usageTime;
