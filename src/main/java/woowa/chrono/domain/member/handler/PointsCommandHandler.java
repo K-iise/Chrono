@@ -113,7 +113,8 @@ public class PointsCommandHandler implements CommandHandler {
                 ModifyPointRequest request = ModifyPointRequest.builder().adminId(adminId)
                         .userId(targetUserId).point(addPoint).build();
                 ModifyPointResponse response = memberService.increasePoint(request);
-                event.getHook().sendMessage(mention + "님에게 **" + response.getPoint() + "** 포인트가 추가되었습니다").queue();
+                event.getHook().sendMessage(mention + "님에게 **" + request.getPoint() + "** 포인트가 추가되었습니다\n"
+                        + "남은 포인트 : " + response.getPoint()).queue();
             }
             case "set" -> {
                 int setPoint = event.getOption("amount").getAsInt();
