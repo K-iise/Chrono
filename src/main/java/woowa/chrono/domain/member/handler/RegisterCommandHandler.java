@@ -1,7 +1,6 @@
 package woowa.chrono.domain.member.handler;
 
 import java.util.List;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -9,17 +8,21 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.stereotype.Component;
 import woowa.chrono.config.jda.handler.CommandHandler;
+import woowa.chrono.config.jda.service.DiscordService;
 import woowa.chrono.domain.member.Grade;
 import woowa.chrono.domain.member.dto.request.MemberRegisterRequest;
+import woowa.chrono.domain.member.dto.response.MemberRegisterResponse;
 import woowa.chrono.domain.member.service.MemberService;
 
 @Component
 public class RegisterCommandHandler implements CommandHandler {
 
     private final MemberService memberService;
+    private final DiscordService discordService;
 
-    public RegisterCommandHandler(MemberService memberService) {
+    public RegisterCommandHandler(MemberService memberService, DiscordService discordService) {
         this.memberService = memberService;
+        this.discordService = discordService;
     }
 
     @Override
@@ -29,7 +32,7 @@ public class RegisterCommandHandler implements CommandHandler {
 
     @Override
     public String getDescription() {
-        return "사용자를 등록합니다.";
+        return "관리자가 사용자를 등록합니다.";
     }
 
     @Override
@@ -40,37 +43,22 @@ public class RegisterCommandHandler implements CommandHandler {
     @Override
     public void handle(SlashCommandInteractionEvent event) {
         try {
-            String callerId = event.getUser().getId();
-            Grade callerGrade = memberService.findMember(callerId, true).getGrade();
+            var targetUser = event.getOption("user").getAsUser();
 
-            if (callerGrade != Grade.ADMIN) {
-                event.reply("이 명령어는 관리자만 사용할 수 있습니다.").setEphemeral(true).queue();
-                return;
-            }
+            // Discord 개인 채널 생성
+            TextChannel channel = discordService.createPersonalChannel(
+                    event.getGuild(),
+                    targetUser.getIdLong(),
+                    targetUser.getName()
+            );
 
-            String memberId = event.getOption("user").getAsUser().getId();
-            String memberName = event.getOption("user").getAsUser().getName();
-
-            // 특정 회원 ID와 부여할 권한을 미리 설정합니다.
-            long targetUserId = event.getOption("user").getAsUser().getIdLong();
-
-            // 특정 회원에게 허용할 권한: 채널 보기(VIEW_CHANNEL) 및 메시지 전송(MESSAGE_SEND)
-            long allowForMember = Permission.VIEW_CHANNEL.getRawValue() | Permission.MESSAGE_SEND.getRawValue();
-
-            // 개인 텍스트 채널 생성
-            TextChannel personalChannel = event.getGuild()
-                    .createTextChannel(memberName)
-                    .addPermissionOverride(event.getGuild().getPublicRole(), 0L,
-                            allowForMember)
-                    .addMemberPermissionOverride(targetUserId,
-                            allowForMember, 0L)
-                    .complete();
-
-            MemberRegisterRequest request = MemberRegisterRequest.builder().userId(memberId).userName(memberName)
-                    .channelId(personalChannel.getId())
+            // 멤버 등록
+            MemberRegisterRequest request = MemberRegisterRequest.builder().userId(targetUser.getId())
+                    .userName(targetUser.getName())
+                    .channelId(channel.getId())
                     .build();
 
-            memberService.registerMember(request);
+            MemberRegisterResponse response = memberService.registerMember(request);
 
             event.reply("등록 완료!").queue();
 

@@ -2,7 +2,10 @@ package woowa.chrono.config.jda.service;
 
 import java.time.Duration;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import woowa.chrono.common.util.DurationUtils;
@@ -12,7 +15,7 @@ import woowa.chrono.domain.event.StudyAutoEndedEvent;
 public class DiscordService {
     private final JDA jda;
 
-    public DiscordService(JDA jda) {
+    public DiscordService(@Lazy JDA jda) {
         this.jda = jda;
     }
 
@@ -51,6 +54,17 @@ public class DiscordService {
                 success -> System.out.println("자동 종료 알림 채널 전송 완료: " + channelId),
                 failure -> System.err.println("[DiscordService] 메시지 전송 실패 (권한 문제 예상): " + failure.getMessage())
         );
+    }
+
+    public TextChannel createPersonalChannel(Guild guild, long userId, String userName) {
+
+        long allow = Permission.VIEW_CHANNEL.getRawValue()
+                | Permission.MESSAGE_SEND.getRawValue();
+
+        return guild.createTextChannel(userName)
+                .addPermissionOverride(guild.getPublicRole(), 0L, allow)
+                .addMemberPermissionOverride(userId, allow, 0L)
+                .complete();
     }
 
 }
