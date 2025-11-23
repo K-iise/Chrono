@@ -112,3 +112,48 @@
 | 최초 서버 설정 단계 | 디스코드 서버 생성 후 **첫 설정 과정에서만 실행 가능** |
 
 즉, **서버 최초 1회만 유효**한 명령어입니다.
+</details>
+
+---
+
+## 🛠️ 트러블 슈팅 (Trouble Shooting)
+
+<details>
+<summary>⚡ Slash Command 3초 응답 제한 초과 오류 (Timeout Error)</summary>
+
+### ❗ 문제 현상 (Symptom)
+데이터베이스 조회, 복잡한 계산 등 **처리 시간이 3초를 초과**하는 작업 수행 시, 최종 응답(reply)에서 아래와 같은 오류가 발생합니다.
+
+`java.lang.IllegalStateException: Interaction has already been acknowledged`
+
+---
+
+### 🔍 원인 (Cause)
+Discord API는 슬래시 커맨드(`Slash Command`)와 같은 **모든 상호작용(Interaction)** 발생 시, **최대 3초 이내에 봇이 응답했다는 것을 반드시 알려야**(`Acknowledge`, ACK) 합니다.
+
+* **ACK 실패:** 3초 안에 응답하지 않으면 디스코드는 해당 Interaction을 **'만료됨(Expired)'** 상태로 간주하고, 최종 응답을 위한 `event.reply()` 호출 시 **"이미 응답되었거나 만료된 상호작용"**이라는 오류가 발생합니다.
+
+### ✅ 해결 방법 (Solution)
+
+작업에 시간이 걸리는 경우, **실제 작업 실행 전에 먼저 디스코드에 응답을 미룬다는 ACK**를 보냅니다. 이후 최종 응답은 **웹훅(Webhook)**을 통해 안전하게 처리합니다.
+
+#### 1. `deferReply()`로 즉시 응답 ACK 처리
+
+시간이 걸리는 로직을 실행하기 **직전에** `deferReply()`를 호출하여 디스코드에게 **"응답 처리 중입니다. 잠시 기다려주세요."**라는 상태를 즉시 알립니다.
+
+```java
+event.deferReply(true).queue(); // 즉시 ACK 처리.
+```
+
+### 2. getHook().sendMessage()로 안전하게 최종 응답
+오래 걸리는 작업이 완료된 후, event.getHook()을 사용하여 응답 웹훅을 통해 최종 메시지를 보냅니다. 웹훅을 사용하면 3초 제한을 우회하여 최대 15분 이내에 안전하게 응답할 수 있습니다.
+
+```java
+Member member = memberService.findMember(userId); // 시간이 오래 걸리는 DB 조회/로직
+
+// getHook()을 사용하여 웹훅 채널로 최종 메시지를 전송
+event.getHook().sendMessage(member.getPoint() + " 포인트 보유").queue();
+```
+
+> ⭐ 핵심 요약: deferReply()로 3초 제한을 회피하고, event.getHook()으로 reply 중복 호출 문제를 동시에 해결합니다.
+</details>
