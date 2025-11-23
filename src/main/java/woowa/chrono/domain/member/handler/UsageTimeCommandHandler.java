@@ -101,7 +101,7 @@ public class UsageTimeCommandHandler implements CommandHandler {
                             .queue();
                 }
                 case "add" -> {
-                    int addUsageTime = event.getOption("usageTime").getAsInt();
+                    int addUsageTime = event.getOption("usagetime").getAsInt();
                     ModifyUsageTimeRequest request = ModifyUsageTimeRequest.builder().adminId(adminId)
                             .userId(targetUserId).usageTime(addUsageTime).build();
                     ModifyUsageTimeResponse response = memberService.increaseUsageTime(request);
@@ -115,7 +115,7 @@ public class UsageTimeCommandHandler implements CommandHandler {
                     event.getHook().sendMessage(message).queue();
                 }
                 case "set" -> {
-                    int setUsageTime = event.getOption("usageTime").getAsInt();
+                    int setUsageTime = event.getOption("usagetime").getAsInt();
                     ModifyUsageTimeRequest request = ModifyUsageTimeRequest.builder()
                             .adminId(adminId).userId(targetUserId).usageTime(setUsageTime).build();
                     ModifyUsageTimeResponse response = memberService.updateUsageTime(request);
@@ -137,44 +137,26 @@ public class UsageTimeCommandHandler implements CommandHandler {
     @Override
     public List<SubcommandGroupData> getSubcommandGroups() {
         return List.of(
-                new SubcommandGroupData("user", "일반 사용자용 포인트 명령어")
+                new SubcommandGroupData("user", "일반 사용자용 이용 시간 명령어")
                         .addSubcommands(
                                 new SubcommandData("get", "현재 보유하고 있는 이용 시간을 확인합니다.")
                         ),
-                new SubcommandGroupData("admin", "관리자용 포인트 명령어")
+                new SubcommandGroupData("admin", "관리자용 이용 시간 명령어")
                         .addSubcommands(
                                 new SubcommandData("get", "특정 사용자의 남은 이용 시간 확인")
                                         .addOptions(new OptionData(OptionType.USER, "user", "조회할 사용자", true)),
                                 new SubcommandData("add", "특정 사용자에게 이용 시간 추가")
                                         .addOptions(
                                                 new OptionData(OptionType.USER, "user", "이용 시간을 추가할 사용자", true),
-                                                new OptionData(OptionType.INTEGER, "usageTime", "추가할 이용 시간(Minutes)",
+                                                new OptionData(OptionType.INTEGER, "usagetime", "추가할 이용 시간(Minutes)",
                                                         true)
                                         ),
                                 new SubcommandData("set", "특정 사용자의 이용 시간 설정")
                                         .addOptions(
                                                 new OptionData(OptionType.USER, "user", "이용 시간을 설정할 사용자", true),
-                                                new OptionData(OptionType.INTEGER, "usageTime", "설정할 이용 시간(Minutes)",
+                                                new OptionData(OptionType.INTEGER, "usagetime", "설정할 이용 시간(Minutes)",
                                                         true)
                                         )
-                        )
-        );
-    }
-
-
-    @Override
-    public List<SubcommandData> getSubcommands() {
-        return List.of(
-                new SubcommandData("get", "사용자의 이용 시간을 조회합니다."),
-                new SubcommandData("add", "사용자의 이용 시간을 추가합니다.")
-                        .addOptions(
-                                new OptionData(OptionType.USER, "user", "추가할 사용자", true),
-                                new OptionData(OptionType.INTEGER, "amount", "추가할 시간", true)
-                        ),
-                new SubcommandData("set", "사용자의 이용 시간을 직접 수정합니다.")
-                        .addOptions(
-                                new OptionData(OptionType.USER, "user", "대상 사용자", true),
-                                new OptionData(OptionType.INTEGER, "amount", "설정할 시간", true)
                         )
         );
     }

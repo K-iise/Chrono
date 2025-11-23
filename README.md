@@ -159,6 +159,27 @@
 
 </details>
 
+<br>
+
+<details><summary><strong>📌 이용 시간 조회 (/times user get)</strong></summary>
+
+사용자가 현재 보유하고 있는 **잔여 이용 시간**을 조회하는 명령어입니다.
+
+**① 명령어 입력**
+
+`ChronoBot`을 멘션하여 `/times user get` 명령어를 입력합니다.
+
+<img src="/image/times_user_get_command.png" alt="유저 이용 시간 조회 명령어">
+
+**② 실행 결과 예시**
+
+현재 남아 있는 이용 시간이 시·분 형태로 포맷팅되어 표시됩니다.
+해당 시간은 스터디룸 또는 공부 기록 가능 시간을 의미합니다.
+
+<img src="/image/times_user_get_result.png" alt="유저 이용 시간 조회 결과">
+
+</details>
+
 ## 🛠️ 트러블 슈팅 (Trouble Shooting)
 
 <details>
