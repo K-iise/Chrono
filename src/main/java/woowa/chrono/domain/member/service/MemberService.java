@@ -9,10 +9,12 @@ import woowa.chrono.common.exception.ErrorCode;
 import woowa.chrono.domain.member.Grade;
 import woowa.chrono.domain.member.Member;
 import woowa.chrono.domain.member.dto.request.AdminRegisterRequest;
+import woowa.chrono.domain.member.dto.request.GetPointRequest;
 import woowa.chrono.domain.member.dto.request.GetUsageTimeRequest;
 import woowa.chrono.domain.member.dto.request.MemberRegisterRequest;
 import woowa.chrono.domain.member.dto.request.UpdateMemberRequest;
 import woowa.chrono.domain.member.dto.response.AdminRegisterResponse;
+import woowa.chrono.domain.member.dto.response.GetPointResponse;
 import woowa.chrono.domain.member.dto.response.GetUsageTimeResponse;
 import woowa.chrono.domain.member.dto.response.MemberRegisterResponse;
 import woowa.chrono.domain.member.dto.response.UpdateMemberResponse;
@@ -46,16 +48,16 @@ public class MemberService {
         return UpdateMemberResponse.from(member);
     }
 
-    // 회원 사용 시간 조회
+    // 회원 이용 시간 조회
     public GetUsageTimeResponse getUsageTime(GetUsageTimeRequest request) {
         Member member = findMember(request.getUserId(), false);
         return GetUsageTimeResponse.from(member);
     }
 
     // 회원 포인트 조회
-    public int getPoint(String userId) {
-        Member found = findMember(userId, false);
-        return found.getPoint();
+    public GetPointResponse getPoint(GetPointRequest request) {
+        Member member = findMember(request.getUserId(), false);
+        return GetPointResponse.from(member);
     }
 
     // 회원 이용 시간 추가 (관리자 권한 필수)

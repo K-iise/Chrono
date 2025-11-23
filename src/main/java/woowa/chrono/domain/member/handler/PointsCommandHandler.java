@@ -11,6 +11,8 @@ import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.common.util.DurationUtils;
 import woowa.chrono.config.jda.handler.CommandHandler;
 import woowa.chrono.domain.member.Member;
+import woowa.chrono.domain.member.dto.request.GetPointRequest;
+import woowa.chrono.domain.member.dto.response.GetPointResponse;
 import woowa.chrono.domain.member.service.MemberService;
 
 @Component
@@ -53,20 +55,38 @@ public class PointsCommandHandler implements CommandHandler {
     }
 
     private void handleUserCommand(SlashCommandInteractionEvent event, String subCommand) {
+        event.deferReply(true).queue(); // ❶ 3초 안에 즉시 ACK
+
         String userId = event.getUser().getId();
-        Member member = memberService.findMember(userId, false);
         String mention = event.getUser().getAsMention();
 
-        switch (subCommand) {
-            case "get" ->
-                    event.reply(mention + "님이 보유한 포인트는 **" + member.getPoint() + "**입니다.").setEphemeral(true).queue();
-            case "use" -> {
-                int amount = event.getOption("amount").getAsInt();
-                memberService.purchaseUsageTime(userId, amount);
-                event.reply(mention + "님의 현재 남은 포인트는 **" + member.getPoint() + "**입니다.\n"
-                        + "남은 이용 시간: " + DurationUtils.format(member.getUsageTime())).setEphemeral(true).queue();
+        try {
+            switch (subCommand) {
+                case "get" -> {
+                    GetPointRequest request = GetPointRequest.builder().userId(userId).build();
+                    GetPointResponse response = memberService.getPoint(request);
+
+                    event.getHook().sendMessage(
+                            mention + "님이 보유한 포인트는 **" + response.getPoint() + "**입니다."
+                    ).queue();
+                }
+
+                case "use" -> {
+                    int amount = event.getOption("amount").getAsInt();
+                    Member member = memberService.purchaseUsageTime(userId, amount);
+
+                    event.getHook().sendMessage(
+                            mention + "님의 현재 남은 포인트는 **" + member.getPoint() + "**입니다.\n"
+                                    + "남은 이용 시간: " + DurationUtils.format(member.getUsageTime())
+                    ).queue();
+                }
+
+                default -> event.getHook().sendMessage("알 수 없는 명령어입니다.").queue();
             }
-            default -> event.reply("알 수 없는 명령어입니다.").setEphemeral(true).queue();
+
+        } catch (ChronoException e) {
+            // ❗ reply가 이미 defer 되었기 때문에 hook으로만 응답해야 함
+            event.getHook().sendMessage(e.getMessage()).queue();
         }
     }
 

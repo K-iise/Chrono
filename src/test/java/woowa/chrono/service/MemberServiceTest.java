@@ -12,9 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.domain.member.Grade;
 import woowa.chrono.domain.member.Member;
+import woowa.chrono.domain.member.dto.request.GetPointRequest;
 import woowa.chrono.domain.member.dto.request.GetUsageTimeRequest;
 import woowa.chrono.domain.member.dto.request.MemberRegisterRequest;
 import woowa.chrono.domain.member.dto.request.UpdateMemberRequest;
+import woowa.chrono.domain.member.dto.response.GetPointResponse;
 import woowa.chrono.domain.member.dto.response.GetUsageTimeResponse;
 import woowa.chrono.domain.member.dto.response.MemberRegisterResponse;
 import woowa.chrono.domain.member.dto.response.UpdateMemberResponse;
@@ -89,10 +91,11 @@ public class MemberServiceTest {
         memberRepository.save(member);
 
         // when
-        int found = memberService.getPoint(member.getUserId());
+        GetPointRequest request = GetPointRequest.builder().userId(member.getUserId()).build();
+        GetPointResponse found = memberService.getPoint(request);
 
         // then
-        assertThat(found).isEqualTo(1000);
+        assertThat(found.getPoint()).isEqualTo(1000);
     }
 
     @Test
