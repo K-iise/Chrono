@@ -13,10 +13,9 @@
 
 ## 📌 목차
 * [기능 목록](#기능-목록)
-* [기술 스택](#기술-스택)
 * [실행 방법](#실행-방법)
 * [배포 환경](#배포-환경)
-
+* [사용자 가이드](#사용자-가이드)
 ---
 
 ## 🛠 기술 스택
@@ -27,12 +26,11 @@
 ![JDA](https://img.shields.io/badge/JDA-7289DA?style=flat&logo=discord&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS-FF9900?style=flat&logo=amazonaws&logoColor=white)
-![Maven](https://img.shields.io/badge/Maven-C71A36?style=flat&logo=apachemaven&logoColor=white)
 ![Git](https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white)
 
 ---
 
-## 기능 목록
+## 주요-기능-목록 (Core Features)
 
 - **포인트 시스템**: 학습 활동으로 포인트 획득 및 이용시간 구매
 - **이용시간 관리**: 포인트로 충전한 이용시간으로 타이머 실행 가능
@@ -44,7 +42,7 @@
 
 ---
 
-## 실행 방법
+## 실행-방법 (How to Run)
 
 1. **환경 변수 설정 (.env 또는 application.yml)**
     ```text
@@ -55,17 +53,62 @@
     ```
 2. **의존성 설치 및 빌드**
     ```bash
-    mvn clean install
+    ./gradlew clean build
     ```
+    - Windows: `gradlew.bat clean build`
+
 3. **애플리케이션 실행**
     ```bash
-    mvn spring-boot:run
+    ./gradlew bootRun
     ```
+    - Windows: `gradlew.bat bootRun`
 
 ---
 
-## 배포 환경
+## 배포-환경 (Deployment environment)
 
 - **AWS**: RDS(MySQL) 사용, EC2 혹은 컨테이너 기반 배포 가능
 - **JVM**: Java 21
 - **Spring Boot**: WebSocket/JDA 연동으로 디스코드 봇 실행
+
+---
+
+## 📘 사용자 가이드 (User Guide)
+
+### 🛠️ 관리자 등록 (setup)
+
+<details>
+<summary><strong>서버 최초 관리자 등록 방법</strong></summary>
+
+#### 1. `setup` 명령어 실행
+서버 최초 1회, 아래 명령어 입력을 통해 **관리자 계정을 등록**합니다.
+
+<img src="/image/setup_command.png" alt="최초 관리자 등록 명령어">
+
+#### 2. 실행 결과 예시
+성공적으로 등록되면 아래와 같은 메시지가 출력됩니다.
+
+<img src="/image/setup_result.png" alt="최초 관리자 등록 결과">
+
+---
+
+#### ⚠️ 왜 setup 명령어가 필요한가?
+
+- 처음 DB에는 **관리자 정보가 저장되어 있지 않음**
+- 따라서 봇은 **어느 사용자가 관리자 역할인지 식별할 수 없음**
+- 그 결과  
+  → 관리자 전용 명령어들이 모두 **차단됨**  
+  (예: `/points admin`, `/times admin`, 기타 관리 기능)
+
+이를 해결하기 위해 **최초에 setup 명령어를 반드시 1회 실행**해야 합니다.
+
+---
+
+#### 🔒 실행 조건
+
+| 조건 | 설명 |
+|------|------|
+| 관리자 수 = 0 | DB에 관리자가 1명이라도 존재하면 `setup` 명령어는 **실행 불가** |
+| 최초 서버 설정 단계 | 디스코드 서버 생성 후 **첫 설정 과정에서만 실행 가능** |
+
+즉, **서버 최초 1회만 유효**한 명령어입니다.

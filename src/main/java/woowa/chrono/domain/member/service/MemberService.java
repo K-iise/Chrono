@@ -29,7 +29,7 @@ public class MemberService {
 
     // 회원 등록
     public MemberRegisterResponse registerMember(MemberRegisterRequest request) {
-        Member member = Member.from(request);
+        Member member = request.toEntity();
         validateDuplication(member);
         memberRepository.save(member);
         return MemberRegisterResponse.from(member);

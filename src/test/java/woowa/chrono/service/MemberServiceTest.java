@@ -37,7 +37,6 @@ public class MemberServiceTest {
         MemberRegisterResponse response = memberService.registerMember(request);
 
         // then
-        // then
         assertThat(response).isNotNull();
         assertThat(response.getUserId()).isEqualTo("1234");
         assertThat(response.getUserName()).isEqualTo("홍길동");

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import woowa.chrono.domain.member.Member;
 
 @Getter
 @NoArgsConstructor
@@ -13,4 +14,12 @@ public class MemberRegisterRequest {
     private String userId;
     private String userName;
     private String channelId;
+
+    public Member toEntity() {
+        return Member.builder()
+                .userId(userId)
+                .userName(userName)
+                .channelId(channelId)
+                .build();
+    }
 }
