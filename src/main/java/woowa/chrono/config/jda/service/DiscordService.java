@@ -1,9 +1,11 @@
 package woowa.chrono.config.jda.service;
 
 import java.time.Duration;
+import java.util.List;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
@@ -36,12 +38,7 @@ public class DiscordService {
     }
 
 
-    /**
-     * 특정 텍스트 채널 ID에 메시지를 비동기로 전송합니다.
-     *
-     * @param channelId 메시지를 보낼 텍스트 채널의 ID
-     * @param message   전송할 메시지 내용
-     */
+    // 특정 텍스트 채널에 메시지 전송
     private void sendMessageToChannel(String channelId, String message) {
         TextChannel textChannel = jda.getTextChannelById(channelId);
 
@@ -56,6 +53,7 @@ public class DiscordService {
         );
     }
 
+    // 개인 텍스트 채널 생성
     public TextChannel createPersonalChannel(Guild guild, long userId, String userName) {
 
         long allow = Permission.VIEW_CHANNEL.getRawValue()
@@ -65,6 +63,25 @@ public class DiscordService {
                 .addPermissionOverride(guild.getPublicRole(), 0L, allow)
                 .addMemberPermissionOverride(userId, allow, 0L)
                 .complete();
+    }
+
+    // 디스코드 역할 변경
+    public void updateMemberRole(String guildId, String userId, Role newRole, List<String> removeRoles) {
+        jda.getGuildById(guildId).retrieveMemberById(userId).queue(member -> {
+            // 기존 역할 제거
+            removeRoles.stream()
+                    .filter(roleName -> member.getRoles().stream().anyMatch(r -> r.getName().equals(roleName)))
+                    .forEach(roleName -> {
+                        Role r = member.getRoles().stream().filter(r2 -> r2.getName().equals(roleName)).findFirst()
+                                .orElse(null);
+                        if (r != null) {
+                            member.getGuild().removeRoleFromMember(member, r).queue();
+                        }
+                    });
+
+            // 새 역할 추가
+            member.getGuild().addRoleToMember(member, newRole).queue();
+        });
     }
 
 }

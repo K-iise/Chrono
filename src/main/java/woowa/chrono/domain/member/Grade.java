@@ -1,5 +1,8 @@
 package woowa.chrono.domain.member;
 
+import java.util.Arrays;
+import java.util.List;
+
 public enum Grade {
     NEWBIE("공부새싹"),
     REGULAR("공부벌레"),
@@ -19,9 +22,15 @@ public enum Grade {
     public static Grade fromRoleName(String roleName) {
         return switch (roleName) {
             case "공부새싹" -> NEWBIE;
-            case "공부벌레" -> ADMIN;
-            case "공부대장" -> REGULAR;
+            case "공부대장" -> ADMIN;
+            case "공부벌레" -> REGULAR;
             default -> throw new IllegalStateException("Unexpected value: " + roleName);
         };
+    }
+
+    public static List<String> getAllRoleNames() {
+        return Arrays.stream(values())
+                .map(Grade::getDisplayName)
+                .toList();
     }
 }

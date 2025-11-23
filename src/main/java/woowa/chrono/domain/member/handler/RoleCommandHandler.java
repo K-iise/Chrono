@@ -1,13 +1,14 @@
 package woowa.chrono.domain.member.handler;
 
 import java.util.List;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.stereotype.Component;
+import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.config.jda.handler.CommandHandler;
+import woowa.chrono.config.jda.service.DiscordService;
 import woowa.chrono.domain.member.Grade;
 import woowa.chrono.domain.member.service.MemberService;
 
@@ -15,9 +16,11 @@ import woowa.chrono.domain.member.service.MemberService;
 public class RoleCommandHandler implements CommandHandler {
 
     private final MemberService memberService;
+    private final DiscordService discordService;
 
-    public RoleCommandHandler(MemberService memberService) {
+    public RoleCommandHandler(MemberService memberService, DiscordService discordService) {
         this.memberService = memberService;
+        this.discordService = discordService;
     }
 
     @Override
@@ -38,28 +41,23 @@ public class RoleCommandHandler implements CommandHandler {
     @Override
     public void handle(SlashCommandInteractionEvent event) {
         String callerId = event.getUser().getId();
-        Grade callerGrade = memberService.findMember(callerId, true).getGrade();
+        var targetUserId = event.getOption("user").getAsUser().getId();
+        var role = event.getOption("role").getAsRole();
+        var newGrade = Grade.fromRoleName(role.getName());
+        var guildId = event.getGuild().getId();
 
-        if (callerGrade != Grade.ADMIN) {
-            event.reply("이 명령어는 관리자만 사용할 수 있습니다.").setEphemeral(true).queue();
-            return;
+        try {
+            memberService.updateMemberGrade(callerId, targetUserId, newGrade);
+
+            discordService.updateMemberRole(guildId, targetUserId, role,
+                    Grade.getAllRoleNames());
+
+            event.reply(event.getOption("user").getAsUser().getAsMention() +
+                    "님의 등급이 **" + newGrade.getDisplayName() + "**(으)로 변경되었습니다.").setEphemeral(true).queue();
+        } catch (ChronoException e) {
+            event.reply(e.getMessage()).setEphemeral(true).queue();
         }
 
-        String userId = event.getOption("user").getAsUser().getId();
-        Role role = event.getOption("role").getAsRole();
-        Grade grade = Grade.fromRoleName(role.getName());
-        memberService.updateMemberGrade(callerId, userId, grade);
-
-        List<String> gradeRoles = List.of("뉴비", "멤버", "관리자");
-
-        event.getGuild().retrieveMemberById(userId).queue(member -> {
-            member.getRoles().stream()
-                    .filter(r -> gradeRoles.contains(r.getName()))
-                    .forEach(r -> event.getGuild().removeRoleFromMember(member, r).queue());
-            event.getGuild().addRoleToMember(member, role).queue();
-        });
-        event.reply(event.getOption("user").getAsUser().getAsMention() +
-                "님의 등급이 **" + grade.getDisplayName() + "**(으)로 변경되었습니다.").queue();
     }
 
     @Override
