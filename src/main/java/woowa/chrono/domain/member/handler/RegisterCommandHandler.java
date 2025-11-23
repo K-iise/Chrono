@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.stereotype.Component;
+import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.config.jda.handler.CommandHandler;
 import woowa.chrono.config.jda.service.DiscordService;
 import woowa.chrono.domain.member.Grade;
@@ -45,6 +46,14 @@ public class RegisterCommandHandler implements CommandHandler {
         try {
             var targetUser = event.getOption("user").getAsUser();
 
+            // 멤버 등록
+            MemberRegisterRequest request = MemberRegisterRequest.builder().userId(targetUser.getId())
+                    .userName(targetUser.getName())
+                    .channelId(null)
+                    .build();
+
+            MemberRegisterResponse response = memberService.registerMember(request);
+
             // Discord 개인 채널 생성
             TextChannel channel = discordService.createPersonalChannel(
                     event.getGuild(),
@@ -52,17 +61,10 @@ public class RegisterCommandHandler implements CommandHandler {
                     targetUser.getName()
             );
 
-            // 멤버 등록
-            MemberRegisterRequest request = MemberRegisterRequest.builder().userId(targetUser.getId())
-                    .userName(targetUser.getName())
-                    .channelId(channel.getId())
-                    .build();
+            memberService.updateChannelId(response.getUserId(), channel.getId());
+            event.reply(targetUser.getAsMention() + "님을 등록했습니다.").setEphemeral(true).queue();
 
-            MemberRegisterResponse response = memberService.registerMember(request);
-
-            event.reply("등록 완료!").queue();
-
-        } catch (IllegalStateException e) {
+        } catch (ChronoException e) {
             event.reply(e.getMessage()).setEphemeral(true).queue();
         }
     }

@@ -24,7 +24,7 @@ public class InitAdminCommandHandler implements CommandHandler {
         this.discordService = discordService;
 
     }
-
+    
     @Override
     public String getName() {
         return "setup";
