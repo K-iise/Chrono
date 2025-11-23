@@ -10,7 +10,8 @@ public enum ErrorCode {
     LACK_POINT("[Error] 포인트가 부족합니다."),
     LACK_TIME("[Error] 이용 시간이 부족합니다."),
     PURCHASE_UNIT("[ERROR] 포인트의 구매 단위는 1000P 입니다."),
-    HAVE_POINT("[ERROR] 보유한 포인트가 부족합니다.");
+    HAVE_POINT("[ERROR] 보유한 포인트가 부족합니다."),
+    EXIST_ADMIN("[ERROR] 이미 관리자가 존재합니다.");
 
     private final String message;
 

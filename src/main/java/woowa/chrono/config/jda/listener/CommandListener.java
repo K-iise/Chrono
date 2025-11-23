@@ -13,14 +13,19 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.springframework.stereotype.Component;
+import woowa.chrono.common.exception.ChronoException;
+import woowa.chrono.common.exception.ErrorCode;
 import woowa.chrono.config.jda.handler.CommandHandler;
 import woowa.chrono.domain.member.Grade;
+import woowa.chrono.domain.member.service.MemberService;
 
 @Component
 public class CommandListener extends ListenerAdapter {
     private final Map<String, CommandHandler> handlerMap;
+    private final MemberService memberService;
 
-    public CommandListener(List<CommandHandler> handlers) {
+    public CommandListener(List<CommandHandler> handlers, MemberService memberService) {
+        this.memberService = memberService;
         this.handlerMap = handlers.stream()
                 .collect(Collectors.toMap(CommandHandler::getName, h -> h));
     }
@@ -34,7 +39,28 @@ public class CommandListener extends ListenerAdapter {
             return;
         }
 
-        handler.handle(event);
+        try {
+            // 호출자 등급 조회
+            String callerId = event.getUser().getId();
+            Grade callerGrade = memberService.findMember(callerId, true).getGrade();
+
+            // 공통 권한 체크
+            if (!hasPermission(callerGrade, handler.requiredGrade())) {
+                event.reply(ErrorCode.NOT_ADMIN.getMessage())
+                        .setEphemeral(true)
+                        .queue();
+                return;
+            }
+
+            handler.handle(event);
+        } catch (ChronoException e) {
+            event.reply(e.getMessage()).queue();
+        }
+
+    }
+
+    private boolean hasPermission(Grade caller, Grade required) {
+        return caller.ordinal() >= required.ordinal();
     }
 
     @Override

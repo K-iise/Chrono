@@ -105,11 +105,30 @@ public class MemberService {
         return member;
     }
 
+    // 관리자 등록 (최초 실행 시에만 사용)
+    public Member registerAdmin(String userId, String userName, String channelId) {
+
+        if (hasAdmin()) {
+            throw new ChronoException(ErrorCode.EXIST_ADMIN);
+        }
+
+        Member admin = Member.builder().userId(userId).userName(userName).grade(Grade.ADMIN).channelId(channelId)
+                .build();
+        validateDuplication(admin);
+        memberRepository.save(admin);
+        return admin;
+    }
+
+    private boolean hasAdmin() {
+        return memberRepository.existsByGrade(Grade.ADMIN);
+    }
+
     // 회원 및 관리자 조회
     private Member findAdminAndMember(String adminId, String userId) {
         findMember(adminId, true); // 관리자 검증
         return findMember(userId, false);
     }
+
 
     // 회원 중복 검증
     private void validateDuplication(Member member) {
