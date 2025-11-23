@@ -100,6 +100,8 @@ public class PointsCommandHandler implements CommandHandler {
         String targetUserId = event.getOption("user").getAsUser().getId();
         String mention = event.getOption("user").getAsUser().getAsMention();
 
+        memberService.findMember(adminId, true);
+
         switch (subCommand) {
             case "get" -> {
                 GetPointRequest request = GetPointRequest.builder().userId(targetUserId).build();
