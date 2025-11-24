@@ -18,7 +18,7 @@ public class RegisterEventResponse {
 
     public static RegisterEventResponse from(Event event, Member admin) {
         return RegisterEventResponse.builder()
-                .channelId(admin.getUserId())
+                .channelId(admin.getChannelId())
                 .eventTitle(event.getTitle()).build();
     }
 }
