@@ -41,7 +41,7 @@ public class StudyRecordListener extends ListenerAdapter {
                 // 사용자의 텍스트 채널에 시작 메시지를 보낸다.
                 if (recordChannel != null) {
                     String message = user.getAsMention() + "님이 공부를 시작합니다.\n"
-                            + "잔여 이용 시간 : " + response.getUsageTime();
+                            + "잔여 이용 시간 : " + DurationUtils.format(response.getUsageTime());
                     recordChannel.sendMessage(message).queue();
                 }
             }

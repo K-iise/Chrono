@@ -2,8 +2,12 @@ package woowa.chrono.domain.event.service;
 
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
+import woowa.chrono.common.exception.ChronoException;
+import woowa.chrono.common.exception.ErrorCode;
 import woowa.chrono.domain.event.Event;
 import woowa.chrono.domain.event.EventRecord;
+import woowa.chrono.domain.event.dto.request.ParticipateEventRequest;
+import woowa.chrono.domain.event.dto.response.ParticipateEventResponse;
 import woowa.chrono.domain.event.repository.EventRecordRepository;
 import woowa.chrono.domain.event.repository.EventRepository;
 import woowa.chrono.domain.member.Member;
@@ -15,44 +19,47 @@ public class EventRecordService {
     private final EventRepository eventRepository;
     private final MemberRepository memberRepository;
 
-    public EventRecordService(EventRecordRepository eventRecordRepository, EventRepository eventRepository,
+    public EventRecordService(EventRecordRepository eventRecordRepository,
+                              EventRepository eventRepository,
                               MemberRepository memberRepository) {
         this.eventRecordRepository = eventRecordRepository;
         this.eventRepository = eventRepository;
         this.memberRepository = memberRepository;
     }
 
-    // 이벤트 참여 기록
-    public void participateEvent(String userId, String eventLocation) {
-        validateDuplication(userId, eventLocation);
+    // 이벤트 참여
+    public ParticipateEventResponse participateEvent(ParticipateEventRequest request) {
+        Member member = findMemberById(request.getUserId());
+        Event event = findEventByLocation(request.getLocation());
 
-        Member member = memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalStateException("등록된 회원이 아닙니다."));
-
-        Event event = eventRepository.findByEventLocation(eventLocation)
-                .orElseThrow(() -> new IllegalStateException("등록된 이벤트가 아닙니다."));
+        validateNotParticipated(member, event);
 
         EventRecord eventRecord = EventRecord.builder()
                 .member(member)
                 .event(event)
-                .participationTime(LocalDateTime.now()).build();
+                .participationTime(LocalDateTime.now())
+                .build();
 
         eventRecordRepository.save(eventRecord);
+        return ParticipateEventResponse.from(eventRecord);
     }
 
-    /**
-     * 특정 회원의 이벤트 참여 여부를 확인합니다.
-     *
-     * @param userId
-     * @param eventLocation
-     */
-    private void validateDuplication(String userId, String eventLocation) {
-        Member member = memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalStateException("등록된 회원이 아닙니다."));
-        Event event = eventRepository.findByEventLocation(eventLocation)
-                .orElseThrow(() -> new IllegalStateException("등록된 이벤트가 아닙니다."));
+    // 회원 조회
+    private Member findMemberById(String userId) {
+        return memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new ChronoException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    // 이벤트 조회
+    private Event findEventByLocation(String eventLocation) {
+        return eventRepository.findByEventLocation(eventLocation)
+                .orElseThrow(() -> new ChronoException(ErrorCode.EVENT_NOT_FOUND));
+    }
+
+    // 창여 여부 검증
+    private void validateNotParticipated(Member member, Event event) {
         if (eventRecordRepository.existsByEventAndMember(event, member)) {
-            throw new IllegalStateException("이미 이벤트에 참여했습니다.");
+            throw new ChronoException(ErrorCode.EVENT_ALREADY);
         }
     }
 }

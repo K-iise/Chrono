@@ -9,7 +9,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.springframework.stereotype.Component;
 import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.config.jda.service.DiscordService;
+import woowa.chrono.domain.event.dto.request.ParticipateEventRequest;
 import woowa.chrono.domain.event.dto.request.RegisterEventRequest;
+import woowa.chrono.domain.event.dto.response.ParticipateEventResponse;
 import woowa.chrono.domain.event.dto.response.RegisterEventResponse;
 import woowa.chrono.domain.event.service.EventRecordService;
 import woowa.chrono.domain.event.service.EventService;
@@ -34,7 +36,7 @@ public class EventListener extends ListenerAdapter {
         try {
             RegisterEventRequest request = RegisterEventRequest.from(event);
             RegisterEventResponse response = eventService.registerEvent(request);
-            
+
             String message = String.format(
                     "<@%s>님이 새로운 이벤트 **%s**을(를) 등록했습니다.",
                     request.getAdminId(), request.getTitle()
@@ -57,23 +59,31 @@ public class EventListener extends ListenerAdapter {
     public void onScheduledEventUserAdd(ScheduledEventUserAddEvent event) {
         String userid = event.getUserId();
         String location = event.getScheduledEvent().getLocation();
-        TextChannel recordChannel = event.getGuild().getTextChannelById("1440644403398967376");
-
         try {
+            ParticipateEventRequest request = ParticipateEventRequest.builder().userId(userid).location(location)
+                    .build();
+
             // 이벤트 참여를 기록한다.
-            eventRecordService.participateEvent(userid, location);
-            System.out.println("userid = " + userid);
-            System.out.println("location = " + location);
+            ParticipateEventResponse response = eventRecordService.participateEvent(request);
+            TextChannel recordChannel = event.getGuild().getTextChannelById(response.getChannelId());
 
             // 사용자의 텍스트 채널에 이벤트 참여 확인 메시지를 보낸다.
             if (recordChannel != null) {
-                recordChannel.sendMessage(
-                                event.getUser().getAsMention() + "님 **" + event.getScheduledEvent().getName()
-                                        + "** 이벤트를 참여합니다.")
-                        .queue();
+                String message = String.format(
+                        "<@%s>님이 **%s** 이벤트를 참여합니다.",
+                        userid, event.getScheduledEvent().getName()
+                );
+                recordChannel.sendMessage(message).queue();
             }
-        } catch (RuntimeException e) {
-            recordChannel.sendMessage(e.getMessage()).queue();
+
+        } catch (ChronoException e) {
+            String userId = event.getScheduledEvent().getCreatorId();
+            var user = event.getJDA().getUserById(userId);
+            if (user != null) {
+                user.openPrivateChannel().queue(channel ->
+                        channel.sendMessage(e.getMessage()).queue()
+                );
+            }
         }
     }
 
@@ -84,22 +94,30 @@ public class EventListener extends ListenerAdapter {
         ThreadChannel threadChannel = event.getThread();
         String location = threadChannel.getJumpUrl();
 
-        TextChannel recordChannel = event.getGuild().getTextChannelById("1440644403398967376");
-
         try {
+            ParticipateEventRequest request = ParticipateEventRequest.builder().userId(userid).location(location)
+                    .build();
             // 이벤트 참여를 기록한다.
-            eventRecordService.participateEvent(userid, location);
-            System.out.println("userid = " + userid);
-            System.out.println("location = " + location);
+            ParticipateEventResponse response = eventRecordService.participateEvent(request);
+
+            TextChannel recordChannel = event.getGuild().getTextChannelById(response.getChannelId());
 
             // 사용자의 텍스트 채널에 이벤트 참여 확인 메시지를 보낸다.
             if (recordChannel != null) {
-                recordChannel.sendMessage(
-                        event.getMember().getAsMention() + "님 **" + threadChannel.getName()
-                                + "** 이벤트를 참여합니다.").queue();
+                String message = String.format(
+                        "<@%s>님이 **%s** 이벤트를 참여합니다.",
+                        userid, response.getTitle()
+                );
+                recordChannel.sendMessage(message).queue();
             }
-        } catch (RuntimeException e) {
-            recordChannel.sendMessage(e.getMessage()).queue();
+        } catch (ChronoException e) {
+            String userId = event.getMember().getId();
+            var user = event.getJDA().getUserById(userId);
+            if (user != null) {
+                user.openPrivateChannel().queue(channel ->
+                        channel.sendMessage(e.getMessage()).queue()
+                );
+            }
         }
     }
 }

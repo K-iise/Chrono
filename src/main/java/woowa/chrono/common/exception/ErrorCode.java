@@ -15,7 +15,8 @@ public enum ErrorCode {
     START_RECORD("[ERROR] 공부 기록을 끝낼 수 없습니다. 기록을 시작해주세요."),
     START_ALREADY("[ERROR] 이미 공부를 시작했습니다."),
     INVALID_EVENT_TIME("[ERROR] 유효하지 않은 이벤트 시간입니다. 시작/종료 시간을 확인해주세요."),
-    EVENT_NOT_FOUND("[ERROR] 존재하지 않는 이벤트입니다.");
+    EVENT_NOT_FOUND("[ERROR] 존재하지 않는 이벤트입니다."),
+    EVENT_ALREADY("[ERROR] 이미 참여한 이벤트입니다.");
 
     private final String message;
 
