@@ -5,12 +5,15 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.stereotype.Component;
+import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.common.util.DurationUtils;
 import woowa.chrono.config.jda.handler.CommandHandler;
 import woowa.chrono.domain.member.Grade;
-import woowa.chrono.domain.member.Member;
 import woowa.chrono.domain.member.service.MemberService;
-import woowa.chrono.domain.study.StudyRecord;
+import woowa.chrono.domain.study.dto.request.EndStudyRequest;
+import woowa.chrono.domain.study.dto.request.StartStudyRequest;
+import woowa.chrono.domain.study.dto.response.EndStudyResponse;
+import woowa.chrono.domain.study.dto.response.StartStudyResponse;
 import woowa.chrono.domain.study.service.StudyRecordService;
 
 @Component
@@ -51,23 +54,47 @@ public class RecordCommandHandler implements CommandHandler {
     }
 
     private void handleStart(SlashCommandInteractionEvent event) {
+        event.deferReply(true).queue();
+        String userId = event.getUser().getId();
+
         try {
-            String userId = event.getUser().getId();
-            Member member = studyRecordService.startStudy(userId, event.getChannelId());
-            String usageTime = DurationUtils.format(member.getUsageTime());
-            event.reply(event.getUser().getAsMention() + "님이 공부를 시작합니다.\n"
-                    + "잔여 이용 시간 : " + usageTime).queue();
-        } catch (IllegalStateException e) {
-            event.reply(e.getMessage()).queue();
+            StartStudyRequest request = StartStudyRequest.builder().userId(userId).build();
+
+            StartStudyResponse response = studyRecordService.startStudy(request);
+            String usageTime = DurationUtils.format(response.getUsageTime());
+            String message = event.getUser().getAsMention() + "님이 공부를 시작합니다.\n"
+                    + "잔여 이용 시간 : " + usageTime;
+
+            // 개인 DM 응답
+            event.getHook().sendMessage(message).setEphemeral(true).queue();
+
+            // 개인 텍스트 채널 응답
+            event.getGuild().getTextChannelById(response.getChannelId()).sendMessage(message).queue();
+        } catch (ChronoException e) {
+            event.getHook().sendMessage(e.getMessage()).queue();
         }
     }
 
     private void handleEnd(SlashCommandInteractionEvent event) {
+        event.deferReply(true).queue();
         String userId = event.getUser().getId();
-        StudyRecord studyRecord = studyRecordService.endStudy(userId);
 
-        event.reply(event.getUser().getAsMention() + "님이 공부를 종료했습니다.\n" +
-                "이용한 시간 : " + DurationUtils.format(studyRecord.getSessionTime())).queue();
+        try {
+            EndStudyRequest request = EndStudyRequest.builder().userId(userId).build();
+            EndStudyResponse response = studyRecordService.endStudy(request);
+            String message = event.getUser().getAsMention() + "님이 공부를 종료했습니다.\n" +
+                    "이용한 시간 : " + DurationUtils.format(response.getStudiedDuration());
+
+            // 개인 DM 응답
+            event.getHook().sendMessage(message).queue();
+
+            // 개인 텍스트 채널 응답
+            event.getGuild().getTextChannelById(response.getChannelId()).sendMessage(message).queue();
+
+        } catch (ChronoException e) {
+            event.getHook().sendMessage(e.getMessage()).queue();
+        }
+
     }
 
     @Override

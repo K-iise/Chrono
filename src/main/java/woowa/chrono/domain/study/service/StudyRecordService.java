@@ -15,6 +15,10 @@ import woowa.chrono.domain.event.StudyAutoEndedEvent;
 import woowa.chrono.domain.member.Member;
 import woowa.chrono.domain.member.repository.MemberRepository;
 import woowa.chrono.domain.study.StudyRecord;
+import woowa.chrono.domain.study.dto.request.EndStudyRequest;
+import woowa.chrono.domain.study.dto.request.StartStudyRequest;
+import woowa.chrono.domain.study.dto.response.EndStudyResponse;
+import woowa.chrono.domain.study.dto.response.StartStudyResponse;
 import woowa.chrono.domain.study.repository.StudyRecordProjection;
 import woowa.chrono.domain.study.repository.StudyRecordRepository;
 
@@ -42,129 +46,135 @@ public class StudyRecordService {
         this.eventPublisher = eventPublisher;
     }
 
-
+    // 공부 기록 시작
     @Transactional
-    public Member startStudy(String userId, String channelId) {
+    public StartStudyResponse startStudy(StartStudyRequest request) {
+        Member member = findMember(request.getUserId());
+        validateStart(member);
 
-        Member member = memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalStateException("등록된 멤버가 아닙니다."));
+        LocalDateTime startTime = LocalDateTime.now();
+        studyReadyMap.put(request.getUserId(), startTime);
 
+        scheduleAutoEnd(member, member.getChannelId());
+
+        return StartStudyResponse.from(member, startTime);
+    }
+
+    // 시작 검증
+    private void validateStart(Member member) {
         if (member.getUsageTime().isNegative() || member.getUsageTime().isZero()) {
             throw new IllegalStateException("잔여 이용 시간이 없습니다.");
         }
-
-        if (studyReadyMap.containsKey(userId)) {
+        if (studyReadyMap.containsKey(member.getUserId())) {
             throw new IllegalStateException("이미 공부를 시작했습니다.");
         }
+    }
 
-        LocalDateTime startTime = LocalDateTime.now();
-        studyReadyMap.put(userId, startTime);
-
-        Runnable endTask = () -> self.autoEndStudy(userId, channelId, member.getUsageTime());
-
+    // 자동 종료 추가
+    private void scheduleAutoEnd(Member member, String channelId) {
+        Runnable endTask = () -> self.autoEndStudy(member.getUserId(), channelId, member.getUsageTime());
         ScheduledFuture<?> future = scheduledExecutorService.schedule(
                 endTask,
                 member.getUsageTime().getSeconds(),
                 TimeUnit.SECONDS
         );
-
-        futureMap.put(userId, future);
-
-        return member;
+        futureMap.put(member.getUserId(), future);
     }
 
+    // 공부 기록 종료
     @Transactional
-    public void autoEndStudy(String userId, String channelId, Duration sessionTime) {
-        Member member = memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalStateException("등록된 멤버가 아닙니다."));
+    public EndStudyResponse endStudy(EndStudyRequest request) {
+        Member member = findMember(request.getUserId());
+        validateEnd(member);
 
-        studyReadyMap.remove(member.getUserId());
+        cancelScheduledFuture(request.getUserId());
 
-        StudyRecord studyRecord = StudyRecord.
-                builder().sessionTime(sessionTime).member(member).recordTime(LocalDateTime.now()).build();
+        Duration studiedDuration = calculateStudiedDuration(member);
+        StudyRecord record = saveStudyRecord(member, studiedDuration);
 
-        studyRecordRepository.save(studyRecord);
-        member.useUsageTime(sessionTime);
-        eventPublisher.publishEvent(new StudyAutoEndedEvent(userId, channelId, sessionTime));
-        futureMap.remove(userId);
+        cleanupAfterEnd(request.getUserId());
 
+        return EndStudyResponse.from(record);
     }
 
-    @Transactional
-    public StudyRecord endStudy(String userId) {
-
-        Member member = memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalStateException("등록된 멤버가 아닙니다."));
-
+    // 종료 검증
+    private void validateEnd(Member member) {
         if (!studyReadyMap.containsKey(member.getUserId())) {
             throw new IllegalStateException("공부 기록을 끝낼 수 없습니다. 기록을 시작해주세요.");
         }
+    }
 
-        if (futureMap.containsKey(userId)) {
-            ScheduledFuture<?> future = futureMap.get(userId);
+    // 자동 종료 제거
+    private void cancelScheduledFuture(String userId) {
+        ScheduledFuture<?> future = futureMap.get(userId);
+        if (future != null) {
             future.cancel(false);
         }
+    }
 
-        LocalDateTime startTime = studyReadyMap.get(member.getUserId());
-        LocalDateTime endTime = LocalDateTime.now();
+    private Duration calculateStudiedDuration(Member member) {
+        LocalDateTime start = studyReadyMap.get(member.getUserId());
+        Duration duration = Duration.between(start, LocalDateTime.now());
+        return duration.compareTo(member.getUsageTime()) > 0 ? member.getUsageTime() : duration;
+    }
 
-        Duration studiedDuration = Duration.between(startTime, endTime);
+    private StudyRecord saveStudyRecord(Member member, Duration sessionTime) {
+        StudyRecord record = StudyRecord.builder()
+                .member(member)
+                .sessionTime(sessionTime)
+                .recordTime(LocalDateTime.now())
+                .build();
 
-        if (studiedDuration.compareTo(member.getUsageTime()) > 0) {
-            studiedDuration = member.getUsageTime();
-        }
-        StudyRecord studyRecord = StudyRecord.
-                builder().sessionTime(studiedDuration).member(member).recordTime(endTime).build();
+        studyRecordRepository.save(record);
+        member.useUsageTime(sessionTime);
+        return record;
+    }
 
-        studyRecordRepository.save(studyRecord);
-        member.useUsageTime(studiedDuration);
-        studyReadyMap.remove(member.getUserId());
+    private void cleanupAfterEnd(String userId) {
+        studyReadyMap.remove(userId);
         futureMap.remove(userId);
+    }
 
-        return studyRecord;
+    // 자동 종료 기능
+    @Transactional
+    public void autoEndStudy(String userId, String channelId, Duration sessionTime) {
+        Member member = findMember(userId);
+
+        studyReadyMap.remove(userId);
+        saveStudyRecord(member, sessionTime);
+        eventPublisher.publishEvent(new StudyAutoEndedEvent(userId, channelId, sessionTime));
+        futureMap.remove(userId);
+    }
+
+    // 주간 공부 시간 조회
+    public Duration getWeeklyUsageTime(String userId) {
+        return getUsageTimeByPeriod(userId, LocalDateTime.now().minusWeeks(1), LocalDateTime.now());
+    }
+
+    // 월간 공부 시간 조회
+    public Duration getMonthlyUsageTime(String userId) {
+        return getUsageTimeByPeriod(userId, LocalDateTime.now().minusMonths(1), LocalDateTime.now());
+    }
+
+    // 연간 공부 시간 조회
+    public Duration getYearlyUsageTime(String userId) {
+        return getUsageTimeByPeriod(userId, LocalDateTime.now().minusYears(1), LocalDateTime.now());
+    }
+
+    // 특정 기간 공부 시간 조회
+    private Duration getUsageTimeByPeriod(String userId, LocalDateTime start, LocalDateTime end) {
+        Member member = findMember(userId);
+        StudyRecordProjection result = studyRecordRepository.findTotalUsageTimeByMember(member, start, end);
+        return result == null ? Duration.ZERO : result.getTotalTime();
     }
 
     public boolean endStudyIfActive(String userId) {
         return futureMap.containsKey(userId);
     }
 
-    // 주간 이용 시간 조회
-    public Duration getWeeklyUsageTime(String userId) {
-        Member member = memberRepository.findByUserId(userId)
+    private Member findMember(String userId) {
+        return memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalStateException("등록된 멤버가 아닙니다."));
-
-        LocalDateTime start = LocalDateTime.now().minusWeeks(1);
-        LocalDateTime end = LocalDateTime.now();
-
-        return getUsageTime(member, start, end);
-    }
-
-    // 월간 이용 시간 조회
-    public Duration getMonthlyUsageTime(String userId) {
-        Member member = memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalStateException("등록된 멤버가 아닙니다."));
-
-        LocalDateTime start = LocalDateTime.now().minusMonths(1);
-        LocalDateTime end = LocalDateTime.now();
-
-        return getUsageTime(member, start, end);
-    }
-
-    // 연간 이용 시간 조회
-    public Duration getYearlyUsageTime(String userId) {
-        Member member = memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalStateException("등록된 멤버가 아닙니다."));
-
-        LocalDateTime start = LocalDateTime.now().minusYears(1);
-        LocalDateTime end = LocalDateTime.now();
-
-        return getUsageTime(member, start, end);
-    }
-
-    // 특정 회원의 이용 시간 조회
-    private Duration getUsageTime(Member member, LocalDateTime start, LocalDateTime end) {
-        StudyRecordProjection result = studyRecordRepository.findTotalUsageTimeByMember(member, start, end);
-        return result == null ? Duration.ZERO : result.getTotalTime();
     }
 
 }
