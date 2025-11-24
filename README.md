@@ -313,6 +313,27 @@
 <img src="/image/event_record_result.png" alt="이벤트 등록 결과 봇 알림">
 </details>
 
+<br>
+
+<details>
+<summary><strong>📌 이벤트 결과 조회 (/event result)</strong></summary>
+
+> 관리자가 진행 중이거나 종료된 이벤트의 **참여자별 누적 이용 시간**을 조회하여 **랭킹**을 출력하는 명령어입니다. 이 명령어는 **이벤트 포스트(스레드)** 내에서만 사용 가능합니다.
+
+**① 명령어 입력**
+
+`/event result` 명령어를 입력합니다. 이 명령어는 **이벤트가 진행된 포럼 스레드** 내에서 실행해야 해당 이벤트를 인식합니다.
+
+<img src="/image/event_result_command.png" alt="이벤트 결과 조회 명령어 입력">
+
+**② 실행 결과 예시**
+
+명령어 실행 후, **`ChronoBot`**은 해당 이벤트에 참여한 멤버들의 **총 이용 시간**을 기준으로 순위를 매겨 출력합니다.
+
+<img src="/image/event_result.png" alt="이벤트 결과 조회 결과">
+
+</details>
+
 ---
 
 ### 👤 일반 사용자 기능 (General User Features)

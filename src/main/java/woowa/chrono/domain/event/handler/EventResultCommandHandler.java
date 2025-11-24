@@ -2,15 +2,18 @@ package woowa.chrono.domain.event.handler;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.stereotype.Component;
+import woowa.chrono.common.exception.ChronoException;
 import woowa.chrono.common.util.DurationUtils;
 import woowa.chrono.config.jda.handler.CommandHandler;
 import woowa.chrono.domain.event.service.EventService;
+import woowa.chrono.domain.member.Grade;
 import woowa.chrono.domain.study.repository.StudyRecordProjection;
 
 @Component
@@ -46,8 +49,14 @@ public class EventResultCommandHandler implements CommandHandler {
         }
     }
 
+    @Override
+    public Grade requiredGrade() {
+        return Grade.ADMIN;
+    }
+
     private void handleResult(SlashCommandInteractionEvent event) {
         try {
+            event.deferReply(false).queue();
             MessageChannelUnion channel = event.getChannel();
 
             if (!channel.getType().isThread()) {
@@ -61,27 +70,31 @@ public class EventResultCommandHandler implements CommandHandler {
             ThreadChannel threadChannel = channel.asThreadChannel();
             String location = threadChannel.getJumpUrl();
 
-            // 정렬된 상태로 이벤트 참가자의 공부 내역을 조회한다.
+            // 정렬된 상태로 이벤트 참가자의 공부 내역을 조회합니다.
             List<StudyRecordProjection> list = eventService.summaryStudyEvent(location);
+            AtomicInteger rankCounter = new AtomicInteger(1);
             String result = list.stream()
+                    // 총 공부 시간(TotalTimeSeconds) 기준으로 내림차순 정렬
                     .sorted(Comparator.comparingLong(StudyRecordProjection::getTotalTimeSeconds).reversed())
-                    .map(this::formatResult)
+                    // 등수(rankCounter)를 증가시키면서 결과를 포맷팅
+                    .map(p -> formatResult(p, rankCounter.getAndIncrement()))
                     .collect(Collectors.joining("\n"));
 
             if (result.isEmpty()) {
-                event.reply("이벤트에 참여한 멤버가 없습니다.").queue();
+                event.getHook().sendMessage("이벤트에 참여한 멤버가 없습니다.").queue();
             } else {
-                event.reply(result).queue();
+                event.getHook().sendMessage("## \uD83C\uDFC6 이벤트 최종 랭킹\n\n" + result).queue();
             }
-        } catch (RuntimeException e) {
-            event.reply(e.getMessage()).queue();
+        } catch (ChronoException e) {
+            event.getHook().sendMessage(e.getMessage()).queue();
         }
 
     }
 
-    private String formatResult(StudyRecordProjection p) {
+    private String formatResult(StudyRecordProjection p, int rank) {
         return String.format(
-                "• <@%s> 님의 이용시간: %s",
+                "• **%d등** | <@%s> 님의 이용시간: %s",
+                rank,
                 p.getMember().getUserId(),
                 DurationUtils.format(p.getTotalTime())
         );
