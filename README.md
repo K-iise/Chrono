@@ -12,12 +12,12 @@
 ---
 
 ## 📖 목차 (Table of Contents)
-* [💻 기술 스택](#💻-기술-스택)
-* [⚙️ 주요 기능 목록](#⚙️-주요-기능-목록-(Core Features))
-* [▶️ 실행 방법](#▶️-실행-방법-(How to Run))
-* [☁️ 배포 환경](#☁️-배포-환경-(Deployment environment))
-* [📘 사용자 가이드](#📘-사용자-가이드-(User Guide))
-* [🛠️ 트러블 슈팅](#🛠️-트러블-슈팅-(Trouble Shooting))
+* [💻 기술 스택](#기술-스택)
+* [⚙️ 주요 기능 목록](#주요-기능-목록-(Core Features))
+* [▶️ 실행 방법](#실행-방법-(How to Run))
+* [☁️ 배포 환경](#배포-환경-(Deployment environment))
+* [📘 사용자 가이드](#사용자-가이드-(User Guide))
+* [🛠️ 트러블 슈팅](#트러블-슈팅-(Trouble Shooting))
 ---
 
 ## 💻 기술 스택
