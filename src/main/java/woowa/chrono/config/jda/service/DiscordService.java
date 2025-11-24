@@ -39,7 +39,7 @@ public class DiscordService {
 
 
     // 특정 텍스트 채널에 메시지 전송
-    private void sendMessageToChannel(String channelId, String message) {
+    public void sendMessageToChannel(String channelId, String message) {
         TextChannel textChannel = jda.getTextChannelById(channelId);
 
         if (textChannel == null) {

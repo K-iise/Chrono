@@ -1,6 +1,5 @@
 package woowa.chrono.domain.event.listener;
 
-import java.time.LocalDateTime;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventCreateEvent;
@@ -8,6 +7,10 @@ import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventUserAddEven
 import net.dv8tion.jda.api.events.thread.member.ThreadMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.springframework.stereotype.Component;
+import woowa.chrono.common.exception.ChronoException;
+import woowa.chrono.config.jda.service.DiscordService;
+import woowa.chrono.domain.event.dto.request.RegisterEventRequest;
+import woowa.chrono.domain.event.dto.response.RegisterEventResponse;
 import woowa.chrono.domain.event.service.EventRecordService;
 import woowa.chrono.domain.event.service.EventService;
 
@@ -16,24 +19,37 @@ public class EventListener extends ListenerAdapter {
 
     private final EventService eventService;
     private final EventRecordService eventRecordService;
+    private final DiscordService discordService;
 
-    public EventListener(EventService eventService, EventRecordService eventRecordService) {
+    public EventListener(EventService eventService, EventRecordService eventRecordService,
+                         DiscordService discordService) {
         this.eventService = eventService;
         this.eventRecordService = eventRecordService;
+        this.discordService = discordService;
     }
 
     // 디스코드 서버에서 새로운 이벤트를 DB에 등록하기 위한 이벤트.
     @Override
     public void onScheduledEventCreate(ScheduledEventCreateEvent event) {
-        String userId = event.getScheduledEvent().getCreatorId();
-        String title = event.getScheduledEvent().getName();
-        String content = event.getScheduledEvent().getDescription();
-        LocalDateTime startTime = event.getScheduledEvent().getStartTime().toLocalDateTime();
-        LocalDateTime endTime = event.getScheduledEvent().getEndTime().toLocalDateTime();
-        String location = event.getScheduledEvent().getLocation();
+        try {
+            RegisterEventRequest request = RegisterEventRequest.from(event);
+            RegisterEventResponse response = eventService.registerEvent(request);
+            
+            String message = String.format(
+                    "<@%s>님이 새로운 이벤트 **%s**을(를) 등록했습니다.",
+                    request.getAdminId(), request.getTitle()
+            );
+            discordService.sendMessageToChannel(response.getChannelId(), message);
+        } catch (ChronoException e) {
+            String creatorId = event.getScheduledEvent().getCreatorId();
+            var user = event.getJDA().getUserById(creatorId);
+            if (user != null) {
+                user.openPrivateChannel().queue(channel ->
+                        channel.sendMessage(e.getMessage()).queue()
+                );
+            }
+        }
 
-        System.out.println("location = " + location);
-        eventService.registerEvent(userId, title, content, location, startTime, endTime);
     }
 
     // 디스코드 서버에서 이벤트에 참가하기 위한 이벤트.

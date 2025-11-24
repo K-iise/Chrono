@@ -11,6 +11,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import woowa.chrono.common.exception.ChronoException;
+import woowa.chrono.common.exception.ErrorCode;
 import woowa.chrono.domain.event.StudyAutoEndedEvent;
 import woowa.chrono.domain.member.Member;
 import woowa.chrono.domain.member.repository.MemberRepository;
@@ -63,10 +65,10 @@ public class StudyRecordService {
     // 시작 검증
     private void validateStart(Member member) {
         if (member.getUsageTime().isNegative() || member.getUsageTime().isZero()) {
-            throw new IllegalStateException("잔여 이용 시간이 없습니다.");
+            throw new ChronoException(ErrorCode.LACK_TIME);
         }
         if (studyReadyMap.containsKey(member.getUserId())) {
-            throw new IllegalStateException("이미 공부를 시작했습니다.");
+            throw new ChronoException(ErrorCode.START_ALREADY);
         }
     }
 
@@ -100,7 +102,7 @@ public class StudyRecordService {
     // 종료 검증
     private void validateEnd(Member member) {
         if (!studyReadyMap.containsKey(member.getUserId())) {
-            throw new IllegalStateException("공부 기록을 끝낼 수 없습니다. 기록을 시작해주세요.");
+            throw new ChronoException(ErrorCode.START_RECORD);
         }
     }
 
@@ -174,7 +176,7 @@ public class StudyRecordService {
 
     private Member findMember(String userId) {
         return memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalStateException("등록된 멤버가 아닙니다."));
+                .orElseThrow(() -> new ChronoException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
 }

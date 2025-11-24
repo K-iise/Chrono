@@ -11,7 +11,11 @@ public enum ErrorCode {
     LACK_TIME("[Error] 이용 시간이 부족합니다."),
     PURCHASE_UNIT("[ERROR] 포인트의 구매 단위는 1000P 입니다."),
     HAVE_POINT("[ERROR] 보유한 포인트가 부족합니다."),
-    EXIST_ADMIN("[ERROR] 이미 관리자가 존재합니다.");
+    EXIST_ADMIN("[ERROR] 이미 관리자가 존재합니다."),
+    START_RECORD("[ERROR] 공부 기록을 끝낼 수 없습니다. 기록을 시작해주세요."),
+    START_ALREADY("[ERROR] 이미 공부를 시작했습니다."),
+    INVALID_EVENT_TIME("[ERROR] 유효하지 않은 이벤트 시간입니다. 시작/종료 시간을 확인해주세요."),
+    EVENT_NOT_FOUND("[ERROR] 존재하지 않는 이벤트입니다.");
 
     private final String message;
 

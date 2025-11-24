@@ -22,12 +22,7 @@ public class EventRecordService {
         this.memberRepository = memberRepository;
     }
 
-    /**
-     * 특정 유저 ID와 이벤트 위치를 통해서 이벤트 참여를 기록합니다.
-     *
-     * @param userId
-     * @param eventLocation
-     */
+    // 이벤트 참여 기록
     public void participateEvent(String userId, String eventLocation) {
         validateDuplication(userId, eventLocation);
 
