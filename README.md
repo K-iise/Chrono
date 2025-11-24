@@ -46,11 +46,14 @@
 
 ## ▶️ 실행 방법 (How to Run)
 
-1. **환경 변수 설정 (.env 또는 application.yml)**
+1. **환경 변수 설정 (`.env` 파일)**
+
+프로젝트 **최상위 루트 디렉토리**에 `.env` 파일을 생성하고 다음 정보를 입력합니다.
+
     ```text
     DISCORD_TOKEN=your_discord_bot_token
     DB_URL=your_database_url
-    DB_USER=your_database_user
+    DB_USERNAME=your_database_user
     DB_PASSWORD=your_database_password
     ```
 2. **의존성 설치 및 빌드**
