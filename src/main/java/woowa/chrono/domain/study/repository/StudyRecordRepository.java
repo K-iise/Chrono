@@ -1,9 +1,9 @@
 package woowa.chrono.domain.study.repository;
 
 import java.time.LocalDateTime;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import woowa.chrono.domain.member.Member;
 import woowa.chrono.domain.study.StudyRecord;
 
