@@ -30,7 +30,7 @@ public class StudyRecordListener extends ListenerAdapter {
         var joinedChannel = event.getChannelJoined();
         var leftChannel = event.getChannelLeft();
 
-        TextChannel recordChannel = event.getGuild().getTextChannelById("1440644403398967376");
+        TextChannel recordChannel = event.getGuild().getTextChannelById("1441968071337185402");
 
         try {
             // 사용자가 새로운 채널에 입장한 경우

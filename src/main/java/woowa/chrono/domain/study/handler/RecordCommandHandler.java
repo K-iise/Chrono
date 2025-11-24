@@ -54,7 +54,9 @@ public class RecordCommandHandler implements CommandHandler {
         try {
             String userId = event.getUser().getId();
             Member member = studyRecordService.startStudy(userId, event.getChannelId());
-            event.reply(event.getUser().getAsMention() + "님이 공부를 시작합니다.").queue();
+            String usageTime = DurationUtils.format(member.getUsageTime());
+            event.reply(event.getUser().getAsMention() + "님이 공부를 시작합니다.\n"
+                    + "잔여 이용 시간 : " + usageTime).queue();
         } catch (IllegalStateException e) {
             event.reply(e.getMessage()).queue();
         }

@@ -348,6 +348,114 @@
 
 </details>
 
+<br>
+
+<details>
+<summary><strong>📌 공부 기록 시작/종료 (/record)</strong></summary>
+
+> 이용 시간을 사용하여 개인 **공부 기록을 시작하고 종료**하는 명령어 그룹입니다.
+
+---
+
+### 1. 공부 시작 (/record start)
+
+**잔여 이용 시간**을 소모하여 개인 공부 기록을 시작합니다. 기록 시작 시, 이용 시간 소모가 시작되고 타이머가 작동합니다.
+
+**① 명령어 입력**
+
+`/record start` 명령어를 입력합니다.
+
+<img src="/image/record_start_command.png" alt="공부 기록 시작 명령어">
+
+**② 실행 결과 예시**
+
+공부 기록이 시작되었음을 알리는 메시지와 함께, 잔여 이용 시간이 표시됩니다. 이 시간만큼 기록이 자동 종료되도록 예약됩니다.
+
+<img src="/image/record_start_result.png" alt="공부 기록 시작 결과">
+
+---
+
+### 2. 공부 종료 (/record end)
+
+진행 중이던 공부 기록을 수동으로 종료하고, **실제 공부한 시간**만큼 이용 시간을 차감합니다.
+
+**① 명령어 입력**
+
+`/record end` 명령어를 입력합니다.
+
+<img src="/image/record_end_command.png" alt="공부 기록 종료 명령어">
+
+**② 실행 결과 예시**
+
+공부 기록이 종료되었음을 알리는 메시지와 함께, **이번 세션의 공부 시간**이 표시됩니다.
+
+<img src="/image/record_end_result.png" alt="공부 기록 종료 결과">
+
+</details>
+
+<br>
+
+<details>
+<summary><strong>📌 이용 시간 통계 조회 (/usage)</strong></summary>
+
+> 사용자가 자신의 **누적 이용 시간 기록**을 주간, 월간, 연간 단위로 조회하는 명령어 그룹입니다.
+
+---
+
+### 1. 주간 이용 시간 조회 (/times week)
+
+최근 **1주일** 동안의 누적 이용 시간을 조회합니다.
+
+**① 명령어 입력**
+
+`/times week` 명령어를 입력합니다.
+
+<img src="/image/times_week_command.png" alt="주간 이용 시간 조회 명령어">
+
+**② 실행 결과 예시**
+
+지난 1주간의 총 공부 시간이 시·분 형태로 표시됩니다.
+
+<img src="/image/times_week_result.png" alt="주간 이용 시간 조회 결과">
+
+---
+
+### 2. 월간 이용 시간 조회 (/times month)
+
+최근 **1개월** 동안의 누적 이용 시간을 조회합니다.
+
+**① 명령어 입력**
+
+`/times month` 명령어를 입력합니다.
+
+<img src="/image/times_month_command.png" alt="월간 이용 시간 조회 명령어">
+
+**② 실행 결과 예시**
+
+지난 1개월간의 총 공부 시간이 시·분 형태로 표시됩니다.
+
+<img src="/image/times_month_result.png" alt="월간 이용 시간 조회 결과">
+
+---
+
+### 3. 연간 이용 시간 조회 (/times year)
+
+최근 **1년** 동안의 누적 이용 시간을 조회합니다.
+
+**① 명령어 입력**
+
+`/times year` 명령어를 입력합니다.
+
+<img src="/image/times_year_command.png" alt="연간 이용 시간 조회 명령어">
+
+**② 실행 결과 예시**
+
+지난 1년간의 총 공부 시간이 시·분 형태로 표시됩니다.
+
+<img src="/image/times_year_result.png" alt="연간 이용 시간 조회 결과">
+
+</details>
+
 ## 🛠️ 트러블 슈팅 (Trouble Shooting)
 
 <details>
